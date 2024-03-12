@@ -52,11 +52,11 @@ class Presentation extends StatelessWidget {
               ),
 
               // liste des photos
-
              DiscoverItem(
               imgpath: 'lib/Assets/Images/Frame1.png',
               title: 'Notre Compus',
              ),
+
 
              DiscoverItem(
               imgpath: 'lib/Assets/Images/Frame2.png',
@@ -64,7 +64,7 @@ class Presentation extends StatelessWidget {
              ),
 
              DiscoverItem(
-              imgpath: 'lib/Assets/Images/Frame1.png',
+              imgpath: 'lib/Assets/Images/Frame3.png',
               title: 'Nos Classes',
              ),
 

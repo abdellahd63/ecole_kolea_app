@@ -12,11 +12,11 @@ class Profil extends StatelessWidget {
           child: Column(
             children: [
               //pic
-                Image.asset('lib/Assets/Images/profilpic.png'),
+                Image.asset('lib/Assets/Images/profilpic.jpg'),
               //name 
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical:20.0),
-                  child: Text("Abdallah Dekkiche", 
+                  child: Text("Bourouba Ilyes", 
                     textAlign: TextAlign.center,
                     softWrap: true,
                     style: TextStyle(

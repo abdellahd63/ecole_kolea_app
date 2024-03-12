@@ -1,4 +1,6 @@
 import 'package:ecole_kolea_app/Constantes/Colors.dart';
+import 'package:ecole_kolea_app/Pages/PlanningCours.dart';
+import 'package:ecole_kolea_app/Pages/PlanningExam.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -37,7 +39,7 @@ class Programmes extends StatelessWidget {
                   Expanded(
                     child: InkWell(
                       onTap: () {
-                        
+                        Navigator.of(context).push(MaterialPageRoute(builder: (context)=>PlanningCours()));
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -71,7 +73,7 @@ class Programmes extends StatelessWidget {
                     Expanded(
                     child: InkWell(
                       onTap: () {
-                        
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>PlanningExam()));
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),

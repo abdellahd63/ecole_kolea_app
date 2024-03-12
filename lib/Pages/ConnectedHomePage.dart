@@ -1,7 +1,9 @@
 
 import 'package:ecole_kolea_app/Constantes/Colors.dart';
+import 'package:ecole_kolea_app/Pages/Bibiotheque.dart';
 import 'package:ecole_kolea_app/Pages/Contact.dart';
 import 'package:ecole_kolea_app/Pages/DeconnectedHomepage.dart';
+import 'package:ecole_kolea_app/Pages/Doleance.dart';
 import 'package:ecole_kolea_app/Pages/Evaluation.dart';
 import 'package:ecole_kolea_app/Pages/Filiere.dart';
 import 'package:ecole_kolea_app/Pages/Login.dart';
@@ -24,7 +26,7 @@ class _DeconnectedHomePageState extends State<ConnectedHomePage> {
 
   int _selectedIndex=0;
 
-    static  List<Widget> routes=[ const Presentation(), const Filiere(),const Profil(),const Programmes(),const Evaluation(),const Notifications(), const Presence(),const Contact()];
+    static  List<Widget> routes=[ const Presentation(), const Filiere() ,  Bibiotheque(),const Profil(),const Programmes(),const Evaluation(),const Notifications(),Doleance(),  Presence(),const Contact()];
 
     void _onitemtapped(int index){
       setState(() {
@@ -88,11 +90,11 @@ class _DeconnectedHomePageState extends State<ConnectedHomePage> {
               },  
             ),
 
-             ListTile(
-              leading: Icon(CupertinoIcons.person),
+            ListTile(
+              leading: Icon(CupertinoIcons.book),
               selected: _selectedIndex==2,
               selectedColor: MyAppColors.principalcolor,
-              title: Text("Profil" ,
+              title: Text("Bibiotheque" ,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -104,11 +106,11 @@ class _DeconnectedHomePageState extends State<ConnectedHomePage> {
               },  
             ),
 
-            ListTile(
-              leading: Icon(CupertinoIcons.calendar),
+             ListTile(
+              leading: Icon(CupertinoIcons.person),
               selected: _selectedIndex==3,
               selectedColor: MyAppColors.principalcolor,
-              title: Text("Programme Et Emploi" ,
+              title: Text("Profil" ,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -121,10 +123,10 @@ class _DeconnectedHomePageState extends State<ConnectedHomePage> {
             ),
 
             ListTile(
-              leading: Icon(Icons.notes),
+              leading: Icon(CupertinoIcons.calendar),
               selected: _selectedIndex==4,
               selectedColor: MyAppColors.principalcolor,
-              title: Text("Evaluation" ,
+              title: Text("Programme Et Emploi" ,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -137,10 +139,10 @@ class _DeconnectedHomePageState extends State<ConnectedHomePage> {
             ),
 
             ListTile(
-              leading: Icon(Icons.notifications),
+              leading: Icon(Icons.notes),
               selected: _selectedIndex==5,
               selectedColor: MyAppColors.principalcolor,
-              title: Text("Notifications" ,
+              title: Text("Evaluation" ,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -153,10 +155,10 @@ class _DeconnectedHomePageState extends State<ConnectedHomePage> {
             ),
 
             ListTile(
-              leading: Icon(Icons.qr_code_scanner),
+              leading: Icon(Icons.notifications),
               selected: _selectedIndex==6,
               selectedColor: MyAppColors.principalcolor,
-              title: Text("Presence" ,
+              title: Text("Notifications" ,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -167,12 +169,44 @@ class _DeconnectedHomePageState extends State<ConnectedHomePage> {
                Navigator.pop(context);
               },  
             ),
+            ListTile(
+              leading: Icon(Icons.messenger_outline),
+              selected: _selectedIndex==7,
+              selectedColor: MyAppColors.principalcolor,
+              title: Text("Doleance" ,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              onTap: (){
+               _onitemtapped(7);
+               Navigator.pop(context);
+              }, 
+            ),
+
+
+            ListTile(
+              leading: Icon(Icons.qr_code_scanner),
+              selected: _selectedIndex==8,
+              selectedColor: MyAppColors.principalcolor,
+              title: Text("Presence" ,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              onTap: (){
+               _onitemtapped(8);
+               Navigator.pop(context);
+              },  
+            ),
 
             
 
              ListTile(
               leading: Icon(CupertinoIcons.phone),
-              selected: _selectedIndex==7,
+              selected: _selectedIndex==9,
               selectedColor: MyAppColors.principalcolor,
               title: Text("Contact" ,
                     style: TextStyle(
@@ -182,7 +216,7 @@ class _DeconnectedHomePageState extends State<ConnectedHomePage> {
                     ),
               ),
               onTap: (){
-               _onitemtapped(7);
+               _onitemtapped(9);
                Navigator.pop(context);
               },  
             ),
