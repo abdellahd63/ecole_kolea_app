@@ -1,11 +1,14 @@
-class Message{
-  String text;
+class Message {
+  String? text;
   DateTime date;
   String type;
-  
-   Message({
-    required this.text,
+  String path;
+
+  Message({
+    this.text,
     required this.date,
     required this.type,
+    required this.path,
   });
+
 }

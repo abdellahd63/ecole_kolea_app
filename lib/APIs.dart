@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:ecole_kolea_app/Auth/AuthContext.dart';
 import 'package:ecole_kolea_app/Auth/UseAuthContext.dart';
 import 'package:ecole_kolea_app/Constant.dart';
@@ -64,11 +66,63 @@ class APIs {
         );
       }
     }catch(e){
-      print(e);
+      print('Error during signin: $e');
       showTopSnackBar(
         Overlay.of(context),
         CustomSnackBar.error(
           message: "Vérifier votre internet!!",
+        ),
+      );
+    }
+  }
+  static Future uploadMyFile(BuildContext context, File? file)async {
+    try {
+      final AuthContext authContext = context.read<AuthContext>();
+      final Map<String, dynamic>? userData = authContext.state.user;
+      String token = userData?['token'].toString() ?? "";
+
+      var request = http.MultipartRequest('POST', Uri.parse('$API_URL/api/user/uploadFile'));
+      request.headers['Authorization'] = 'Bearer $token';
+
+      // Append fields to the request
+      if (file != null) {
+        if (file.existsSync()) {
+          request.files.add(await http.MultipartFile.fromPath('file', file.path));
+        } else {
+          throw Exception('file does not exist: ${file.path}');
+        }
+      }
+      // Send the request
+      var response = await request.send();
+      var httpresponse = await http.Response.fromStream(response);
+      final data = json.decode(httpresponse.body);
+      if (response.statusCode == 200) {
+        showTopSnackBar(
+          Overlay.of(context),
+          CustomSnackBar.success(
+            message: 'image uploaded successfully',
+          ),
+        );
+
+        return data['path'].toString();
+      } else {
+        // Handle the error in case of an unsuccessful request
+        var responseBody = await response.stream.bytesToString();
+        var responseMessage = json.decode(responseBody)['message'];
+        showTopSnackBar(
+          Overlay.of(context),
+          CustomSnackBar.error(
+            message: responseMessage,
+          ),
+        );
+      }
+      return '';
+    } catch (e) {
+      print('Error during uploading: $e');
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: 'vérifier votre internet',
         ),
       );
     }

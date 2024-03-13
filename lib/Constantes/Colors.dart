@@ -7,6 +7,6 @@ class MyAppColors {
   static var blue=Color.fromARGB(255, 150, 180, 255);
   static var darkblue=Color(0xff060E30);
   static var black=Color.fromARGB(255, 0, 0, 0);
-  
+  static var gray400=Colors.grey[400];
   
 }
