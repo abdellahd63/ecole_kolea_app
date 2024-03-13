@@ -1,32 +1,75 @@
+import 'package:ecole_kolea_app/Auth/AuthContext.dart';
 import 'package:ecole_kolea_app/Constantes/Colors.dart';
 import 'package:ecole_kolea_app/Model/Message.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class Chat extends StatefulWidget {
-  Chat({super.key});
+  Chat({super.key, required this.UserID});
+  final String UserID;
 
   @override
   State<Chat> createState() => _ChatState();
 }
 
 class _ChatState extends State<Chat> {
-  List<Message> messages=[
-    Message(text: "Bonjour", date: DateTime.now().subtract(Duration(minutes: 1)), issentbyme: true),
-    Message(text: "Bonjour", date: DateTime.now().subtract(Duration(minutes: 1)), issentbyme: false),
-    Message(text: "Cava !", date: DateTime.now().subtract(Duration(minutes: 1)), issentbyme: true),
-    Message(text: "Tres bien hmdlh", date: DateTime.now().subtract(Duration(minutes: 1)), issentbyme: false),
-    Message(text: "Monsieur je veux savoir ou je peux trouver des sujets d'examen", date: DateTime.now().subtract(Duration(minutes: 1)), issentbyme: true),
-    Message(text: "ici : www.asdfg.com", date: DateTime.now().subtract(Duration(minutes: 1)), issentbyme: false),
-    Message(text: "Merci", date: DateTime.now().subtract(Duration(minutes: 1)), issentbyme: true),
-    Message(text: "Bonne nuit", date: DateTime.now().subtract(Duration(minutes: 1)), issentbyme: false)
-
-  ];
-
   TextEditingController messagecontroller=new TextEditingController();
+  late IO.Socket socket;
+  bool sendButton = false;
+  String mysourceID = "";
+  List<Message> messages=[];
 
+  void connecte(){
+    socket = IO.io("http://192.168.1.100:8000", <String,dynamic>{
+      "transports":["websocket"],
+      "autoConnect": false,
+    });
+    socket.connect();
+    socket.emit("signin", mysourceID);
+    socket.onConnect((data) {
+      print("connected");
+      socket.on("destinationMessage", (msg) {
+        print(msg);
+        setMessage(msg["msg"], "destination");
+      }
+      );
+    });
+  }
+  void sendMessage(String msg, String sourceID, String targetID){
+    setMessage(msg, "source");
+    socket.emit("message", {
+      "msg" : msg,
+      "sourceID": sourceID,
+      "targetID": targetID
+    });
+  }
+  void setMessage(String msg, String type){
+    Message message = Message(text: msg, date: DateTime.now(), type: type);
+    if(mounted) {
+      setState(() {
+        messages.add(message);
+      });
+    }
+  }
+  @override
+  void initState() {
+    super.initState();
+    final AuthContext authContext = context.read<AuthContext>();
+    final Map<String, dynamic>? userData = authContext.state.user;
+    setState(() {
+      mysourceID = userData?['id'].toString() ?? "";
+    });
+    connecte();
+  }
+  @override
+  void dispose() {
+    socket.disconnect();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,15 +108,15 @@ class _ChatState extends State<Chat> {
                 ),
               ),
               itemBuilder: (context, element) => Align(
-                alignment: element.issentbyme ? Alignment.centerRight : Alignment.centerLeft,
+                alignment: element.type == "source" ? Alignment.centerRight : Alignment.centerLeft,
                 child: Card(
-                  color: element.issentbyme ? MyAppColors.principalcolor : MyAppColors.whitecolor,
-                  margin: element.issentbyme ? EdgeInsets.only(left: 25 , bottom: 10, right: 10) :EdgeInsets.only(right:25 ,bottom: 10, left:10),
+                  color: element.type == "source" ? MyAppColors.principalcolor : MyAppColors.whitecolor,
+                  margin: element.type == "source" ? EdgeInsets.only(left: 25 , bottom: 10, right: 10) :EdgeInsets.only(right:25 ,bottom: 10, left:10),
                   child: Padding(
                     padding: EdgeInsets.all(12),
                     child: Text(element.text,
                       style: TextStyle(
-                        color: element.issentbyme ? MyAppColors.whitecolor : MyAppColors.black,
+                        color: element.type == "source" ? MyAppColors.whitecolor : MyAppColors.black,
                       ),
                     ),
                     ),
@@ -91,27 +134,37 @@ class _ChatState extends State<Chat> {
             child: TextField(
               autocorrect: true,
               controller: messagecontroller,
+              onChanged: (val){
+                if(val.length > 0){
+                  setState(() {
+                    sendButton = true;
+                  });
+                }else{
+                  setState(() {
+                    sendButton = false;
+                  });
+                }
+              },
               decoration: InputDecoration(
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.all(12),
-                hintText: " Message",
-                
+                hintText: "Message",
                 suffixIcon: InkWell(
-                  child: Icon(Icons.send, color: MyAppColors.principalcolor,),
+                  child: sendButton ? Icon(Icons.send, color: MyAppColors.principalcolor,) : Icon(Icons.mic, color: MyAppColors.principalcolor,),
                   onTap: (){
                     setState(() {
-                      if(messagecontroller.text.isNotEmpty){
-                       messages.add(new Message(text: messagecontroller.text, date: DateTime.now(), issentbyme: true));
-                       
-                    }
+                      if(messagecontroller.text.isNotEmpty && sendButton){
+                        sendMessage(
+                            messagecontroller.text,
+                            mysourceID,
+                            widget.UserID
+                        );
+                       messagecontroller.clear();
+                      }
                     });
-                   
-                    
                   },
                   )
               ),
-
-              
             ),
           )
       ]),

@@ -1,12 +1,17 @@
+import 'package:ecole_kolea_app/Auth/AuthContext.dart';
 import 'package:ecole_kolea_app/Constantes/Colors.dart';
 import 'package:ecole_kolea_app/Pages/Chat.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Doleance extends StatelessWidget {
   const Doleance({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final AuthContext authContext = context.read<AuthContext>();
+    final Map<String, dynamic>? userData = authContext.state.user;
+    String UserID = userData?['id'].toString() ?? "";
     return Scaffold(
       backgroundColor: MyAppColors.whitecolor,
       body: SingleChildScrollView(
@@ -30,7 +35,7 @@ class Doleance extends StatelessWidget {
                 
               ),
               onTap: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>Chat()));
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>Chat(UserID: (UserID == "1") ? "2" : "1")));
               },
             ),
             Divider(),

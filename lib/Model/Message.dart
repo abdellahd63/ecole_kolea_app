@@ -1,11 +1,11 @@
 class Message{
   String text;
   DateTime date;
-  bool issentbyme;
+  String type;
   
    Message({
     required this.text,
     required this.date,
-    required this.issentbyme,
+    required this.type,
   });
 }
