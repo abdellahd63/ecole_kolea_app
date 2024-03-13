@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:ecole_kolea_app/Constant.dart';
 import 'package:ecole_kolea_app/Constantes/Colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -26,7 +27,14 @@ class MessageFileCard extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15)
             ),
-            child: Image.file(File(path), fit: BoxFit.fitHeight,),
+            child: type == "source" ? Image.file(
+              File(path),
+              fit: BoxFit.cover,
+            ) :
+            Image.network(
+              Constant.URL+"/files/"+path.toString(),
+              fit: BoxFit.cover,
+            ),
           ),
         ),
       ),

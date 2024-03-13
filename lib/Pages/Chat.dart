@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:ecole_kolea_app/APIs.dart';
 import 'package:ecole_kolea_app/Auth/AuthContext.dart';
 import 'package:ecole_kolea_app/Componants/MessageFileCard.dart';
+import 'package:ecole_kolea_app/Componants/SendedMessageCard.dart';
 import 'package:ecole_kolea_app/Constantes/Colors.dart';
 import 'package:ecole_kolea_app/Model/Message.dart';
 import 'package:flutter/cupertino.dart';
@@ -63,7 +64,7 @@ class _ChatState extends State<Chat> {
         text: msg,
         date: DateTime.now(),
         type: type,
-        path: path
+        path: path != null ? path.toString() : ""
     );
     if(mounted) {
       setState(() {
@@ -84,6 +85,7 @@ class _ChatState extends State<Chat> {
     }
     String serverPath = await APIs.uploadMyFile(context, file);
     socket.emit("message", {
+      "msg" : '',
       "sourceID": mysourceID,
       "targetID": widget.targetID,
       "path": serverPath
@@ -146,36 +148,15 @@ class _ChatState extends State<Chat> {
               ),
               itemBuilder: (context, element) => Align(
                 alignment: element.type == "source" ? Alignment.centerRight : Alignment.centerLeft,
-                child: Card(
-                  color: element.type == "source" ? MyAppColors.principalcolor : MyAppColors.whitecolor,
-                  margin: element.type == "source" ? EdgeInsets.only(left: 25 , bottom: 10, right: 10) :EdgeInsets.only(right:25 ,bottom: 10, left:10),
-                  child: Padding(
-                    padding: EdgeInsets.all(12),
-                    child: Column(
-                        children: [
-                          if (element.path == null)
-                            Text(element.text ?? '',
-                              textAlign: element.type == "source" ? TextAlign.right : TextAlign.left,
-                              style: TextStyle(
-                                color: element.type == "source" ? MyAppColors.whitecolor : MyAppColors.black,
-                              ),
-                            )
-                          else
-                            MessageFileCard(
-                              type: element.type,
-                              path: element.path
-                            ),
-                          Text(element.date.toString().substring(10,16),
-                            textAlign: element.type == "source" ? TextAlign.right : TextAlign.left,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: element.type == "source" ? MyAppColors.whitecolor : MyAppColors.black,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                ),
+                child: element.path.isNotEmpty ?
+                  MessageFileCard(
+                      type: element.type,
+                      path: element.path
+                  ) :
+                  SendedMessageCard(
+                      text: element.text ?? '',
+                      time: element.date.toString().substring(10,16),
+                      type: element.type),
               ),
 
           )),
@@ -208,27 +189,26 @@ class _ChatState extends State<Chat> {
                 suffixIcon: InkWell(
                   child: sendButton ? Icon(Icons.send, color: MyAppColors.principalcolor,) : Icon(Icons.upload_file, color: MyAppColors.principalcolor,),
                   onTap: () async {
-                    if(!sendButton){
+                    if (!sendButton) {
                       file = await imagePicker.pickImage(source: ImageSource.gallery);
-                      if(file == null){
+                      if (file == null) {
                         showTopSnackBar(
                           Overlay.of(context),
                           CustomSnackBar.info(
-                            message: "le fichier n\'a pas été téléchargé correctement, vous devez le joindre à nouveau",
+                            message: "le fichier n'a pas été téléchargé correctement, vous devez le joindre à nouveau",
                           ),
                         );
                         return;
-                      }else{
+                      } else {
                         await sendIMG(File(file!.path));
                       }
-                    }else{
-                      if(messagecontroller.text.isNotEmpty &&
-                          sendButton){
+                    } else {
+                      if (messagecontroller.text.isNotEmpty && sendButton) {
                         sendMessage(
-                            messagecontroller.text,
-                            mysourceID,
-                            widget.targetID,
-                            ""
+                          messagecontroller.text,
+                          mysourceID,
+                          widget.targetID,
+                          "",
                         );
                         messagecontroller.clear();
                         setState(() {
@@ -237,7 +217,7 @@ class _ChatState extends State<Chat> {
                       }
                     }
                   },
-                  )
+                )
               ),
             ) :
             TextField(
@@ -260,38 +240,35 @@ class _ChatState extends State<Chat> {
                   hintText: "Entrez votre message",
                   suffixIcon: InkWell(
                     child: sendButton ? Icon(Icons.send, color: MyAppColors.principalcolor,) : Icon(Icons.upload_file, color: MyAppColors.principalcolor,),
-                    onTap: (){
-                      setState(() async {
-                        if(!sendButton){
-                          file = await imagePicker.pickImage(source: ImageSource.gallery);
-                          if(file == null){
-                            showTopSnackBar(
-                              Overlay.of(context),
-                              CustomSnackBar.info(
-                                message: "le fichier n\'a pas été téléchargé correctement, vous devez le joindre à nouveau",
-                              ),
-                            );
-                            return;
-                          }else{
-                            await sendIMG(File(file!.path));
-                          }
-                        }else{
-                          if(messagecontroller.text.isNotEmpty &&
-                              sendButton){
-                            sendMessage(
-                                messagecontroller.text,
-                                mysourceID,
-                                widget.targetID,
-                                ""
-                            );
-                            messagecontroller.clear();
-                            setState(() {
-                              sendButton = false;
-                            });
-                          }
-                        }                      });
-                    },
-                  )
+                    onTap: () async {
+                      if (!sendButton) {
+                        file = await imagePicker.pickImage(source: ImageSource.gallery);
+                        if (file == null) {
+                          showTopSnackBar(
+                            Overlay.of(context),
+                            CustomSnackBar.info(
+                              message: "le fichier n'a pas été téléchargé correctement, vous devez le joindre à nouveau",
+                            ),
+                          );
+                          return;
+                        } else {
+                          await sendIMG(File(file!.path));
+                        }
+                      } else {
+                        if (messagecontroller.text.isNotEmpty && sendButton) {
+                          sendMessage(
+                            messagecontroller.text,
+                            mysourceID,
+                            widget.targetID,
+                            "",
+                          );
+                          messagecontroller.clear();
+                          setState(() {
+                            sendButton = false;
+                          });
+                        }
+                      }
+                    },                  )
               ),
             ),
           )
