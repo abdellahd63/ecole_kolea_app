@@ -34,7 +34,7 @@ class APIs {
       };
 
       final response = await http.post(
-        Uri.parse('${API_URL}/api/user/signin'),
+        Uri.parse('${API_URL}/api/auth/signin'),
         body: jsonEncode(data),
         headers: {'Content-Type': 'application/json'},
       );

@@ -9,12 +9,12 @@ class Doleance extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<User> users=[
-      User(id: 1, nom: "zino1", prenom: "boumrar", type: "administrator"),
-      User(id: 2, nom: "zino2", prenom: "aguibi", type: "student"),
-      User(id: 3, nom: "zino3", prenom: "hakem", type: "director"),
-      User(id: 4, nom: "zino4", prenom: "dekkiche", type: "teacher"),
-      User(id: 5, nom: "zino5", prenom: "khaldi", type: "teacher"),
-      User(id: 6, nom: "zino6", prenom: "nouar", type: "administrator"),
+      User(id: 1, nom: "boumrar", prenom: "zineeddine", type: "administrator"),
+      User(id: 2, nom: "dekkiche", prenom: "abdallah", type: "student"),
+      User(id: 3, nom: "khaldi", prenom: "abdelmoumen", type: "director"),
+      User(id: 4, nom: "hakem", prenom: "yassine", type: "teacher"),
+      User(id: 5, nom: "nouar", prenom: "lokmane", type: "teacher"),
+      User(id: 6, nom: "aguibi", prenom: "younes", type: "administrator"),
     ];
     return Scaffold(
       backgroundColor: MyAppColors.whitecolor,

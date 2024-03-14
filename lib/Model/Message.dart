@@ -1,3 +1,6 @@
+import 'package:ecole_kolea_app/Auth/AuthContext.dart';
+import 'package:flutter/material.dart';
+
 class Message {
   String? text;
   DateTime date;
@@ -11,4 +14,12 @@ class Message {
     required this.path,
   });
 
+  factory Message.fromJson(Map<String, dynamic> json, String mysourceID) {
+    return Message(
+      text: json['message'],
+      date: DateTime.parse(json['createdAt']),
+      type: json['source'] == mysourceID ? "source" : "target",
+      path: json['path'],
+    );
+  }
 }

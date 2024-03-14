@@ -4,6 +4,7 @@ import 'package:ecole_kolea_app/APIs.dart';
 import 'package:ecole_kolea_app/Auth/AuthContext.dart';
 import 'package:ecole_kolea_app/Componants/MessageFileCard.dart';
 import 'package:ecole_kolea_app/Componants/SendedMessageCard.dart';
+import 'package:ecole_kolea_app/Constant.dart';
 import 'package:ecole_kolea_app/Constantes/Colors.dart';
 import 'package:ecole_kolea_app/Model/Message.dart';
 import 'package:flutter/cupertino.dart';
@@ -35,19 +36,18 @@ class _ChatState extends State<Chat> {
   ImagePicker imagePicker = ImagePicker();
   XFile? file;
   void connecte(){
-    socket = IO.io("http://192.168.1.100:8000", <String,dynamic>{
+    socket = IO.io(Constant.URL, <String,dynamic>{
       "transports":["websocket"],
       "autoConnect": false,
     });
     socket.connect();
     socket.emit("signin", mysourceID);
     socket.onConnect((data) {
-      print("connected");
       socket.on("destinationMessage", (msg) {
-        print(msg);
         setMessage(msg["msg"], "destination", msg["path"]);
       }
       );
+
     });
   }
   void sendMessage(String msg, String sourceID, String targetID, String path){
@@ -103,6 +103,20 @@ class _ChatState extends State<Chat> {
       mysourceType = userData?['type'].toString() ?? "";
     });
     connecte();
+    // Request chat history when the chat screen is opened
+    socket.emit('getChatHistory', {
+      "source" : mysourceID,
+      "target" : widget.targetID
+    });
+    // Listen for chat history response from the server
+    socket.on('chatHistory', (chatHistory) {
+      if (mounted) {
+        setState(() {
+          // Update messages list with chat history
+          messages = chatHistory.map<Message>((item) => Message.fromJson(item, mysourceID)).toList();
+        });
+      }
+    });
   }
   @override
   void dispose() {
@@ -167,7 +181,7 @@ class _ChatState extends State<Chat> {
             color: MyAppColors.dimopacityvblue,
            ),
             
-            child: mysourceType == "student" ?
+            child: mysourceType == "etudiant" ?
             TextField(
               autocorrect: true,
               controller: messagecontroller,
