@@ -1,4 +1,5 @@
 
+import 'package:ecole_kolea_app/Auth/AuthContext.dart';
 import 'package:ecole_kolea_app/Constantes/Colors.dart';
 import 'package:ecole_kolea_app/Pages/Bibiotheque.dart';
 import 'package:ecole_kolea_app/Pages/Contact.dart';
@@ -14,6 +15,7 @@ import 'package:ecole_kolea_app/Pages/Profil.dart';
 import 'package:ecole_kolea_app/Pages/Programmes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ConnectedHomePage extends StatefulWidget {
   const ConnectedHomePage({super.key});
@@ -231,10 +233,13 @@ class _DeconnectedHomePageState extends State<ConnectedHomePage> {
                     ),
               ),
               onTap: (){
-               
-               Navigator.pop(context);
-               Navigator.of(context).push(MaterialPageRoute(builder: (context)=>DeconnectedHomePage()));
-              },  
+                final AuthContext authContext = context.read<AuthContext>();
+                authContext.logout();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => DeconnectedHomePage()),
+                );
+              },
             ),
         ]),
       ),

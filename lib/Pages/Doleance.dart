@@ -9,12 +9,12 @@ class Doleance extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<User> users=[
-      User(id: 1, nom: "boumrar", prenom: "zineeddine", type: "administrator"),
-      User(id: 2, nom: "dekkiche", prenom: "abdallah", type: "student"),
-      User(id: 3, nom: "khaldi", prenom: "abdelmoumen", type: "director"),
-      User(id: 4, nom: "hakem", prenom: "yassine", type: "teacher"),
-      User(id: 5, nom: "nouar", prenom: "lokmane", type: "teacher"),
-      User(id: 6, nom: "aguibi", prenom: "younes", type: "administrator"),
+      User(id: 1, nom: "boumrar", prenom: "zineeddine", type: "enseignant"),
+      User(id: 2, nom: "dekkiche", prenom: "abdallah", type: "etudiant"),
+      User(id: 3, nom: "khaldi", prenom: "abdelmoumen", type: "etudiant"),
+      User(id: 4, nom: "hakem", prenom: "yassine", type: "user"),
+      User(id: 5, nom: "nouar", prenom: "lokmane", type: "enseignant"),
+      User(id: 6, nom: "aguibi", prenom: "younes", type: "user"),
     ];
     return Scaffold(
       backgroundColor: MyAppColors.whitecolor,
@@ -32,8 +32,8 @@ class Doleance extends StatelessWidget {
                 return MessageCard(
                   imgpath: 'lib/Assets/Images/noprofilpic.png',
                   title: users[index].nom +" "+ users[index].prenom,
-                  subTitle: users[index].type,
-                  UserID: users[index].id.toString(),
+                  type: users[index].type,
+                  TargetID: users[index].id.toString(),
                 );
               },
             ),

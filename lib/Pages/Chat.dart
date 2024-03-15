@@ -18,8 +18,8 @@ import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class Chat extends StatefulWidget {
-  Chat({super.key, required this.targetID, required this.Title});
-  final String targetID;
+  Chat({super.key, required this.target, required this.Title});
+  final Map<String, dynamic> target;
   final String Title;
 
   @override
@@ -43,20 +43,24 @@ class _ChatState extends State<Chat> {
     socket.connect();
     socket.emit("signin", mysourceID);
     socket.onConnect((data) {
-      socket.on("destinationMessage", (msg) {
+      socket.on("replyMessage", (msg) {
         setMessage(msg["msg"], "destination", msg["path"]);
       }
       );
 
     });
   }
-  void sendMessage(String msg, String sourceID, String targetID, String path){
-    setMessage(msg, "source", path);
+  void sendMessage(String msg, String targetID, String path){
+    setMessage(msg, mysourceType, path);
     socket.emit("message", {
       "msg" : msg,
-      "sourceID": sourceID,
+      "sourceID": mysourceID,
       "targetID": targetID,
-      "path": path
+      "date": DateTime.now().toString(),
+      "sujet": '',
+      "source": mysourceType,
+      "path": path,
+      "type": mysourceType + widget.target["type"]
     });
   }
   void setMessage(String msg, String type, String path){
@@ -75,7 +79,7 @@ class _ChatState extends State<Chat> {
   Future<void> sendIMG(File file) async {
     Message message = Message(
         date: DateTime.now(),
-        type: "source",
+        type: mysourceType,
         path: file.path
     );
     if(mounted) {
@@ -87,8 +91,12 @@ class _ChatState extends State<Chat> {
     socket.emit("message", {
       "msg" : '',
       "sourceID": mysourceID,
-      "targetID": widget.targetID,
-      "path": serverPath
+      "targetID": widget.target["id"],
+      "date": DateTime.now().toString(),
+      "sujet": '',
+      "source": mysourceType,
+      "path": serverPath,
+      "type": mysourceType + widget.target["type"]
     });
   }
   @override
@@ -105,15 +113,19 @@ class _ChatState extends State<Chat> {
     connecte();
     // Request chat history when the chat screen is opened
     socket.emit('getChatHistory', {
-      "source" : mysourceID,
-      "target" : widget.targetID
+      "sourceID" : mysourceID,
+      "targetID" : widget.target["id"],
+      "type" : mysourceType + widget.target["type"]
     });
     // Listen for chat history response from the server
     socket.on('chatHistory', (chatHistory) {
       if (mounted) {
+
         setState(() {
           // Update messages list with chat history
-          messages = chatHistory.map<Message>((item) => Message.fromJson(item, mysourceID)).toList();
+          if (chatHistory != null) {
+            messages = chatHistory.map<Message>((item) => Message.fromJson(item)).toList();
+          }
         });
       }
     });
@@ -161,16 +173,16 @@ class _ChatState extends State<Chat> {
                 ),
               ),
               itemBuilder: (context, element) => Align(
-                alignment: element.type == "source" ? Alignment.centerRight : Alignment.centerLeft,
+                alignment: element.type == mysourceType ? Alignment.centerRight : Alignment.centerLeft,
                 child: element.path.isNotEmpty ?
                   MessageFileCard(
-                      type: element.type,
+                      type: element.type == mysourceType,
                       path: element.path
                   ) :
                   SendedMessageCard(
                       text: element.text ?? '',
                       time: element.date.toString().substring(10,16),
-                      type: element.type),
+                      type: element.type == mysourceType),
               ),
 
           )),
@@ -220,8 +232,7 @@ class _ChatState extends State<Chat> {
                       if (messagecontroller.text.isNotEmpty && sendButton) {
                         sendMessage(
                           messagecontroller.text,
-                          mysourceID,
-                          widget.targetID,
+                          widget.target["id"],
                           "",
                         );
                         messagecontroller.clear();
@@ -272,8 +283,7 @@ class _ChatState extends State<Chat> {
                         if (messagecontroller.text.isNotEmpty && sendButton) {
                           sendMessage(
                             messagecontroller.text,
-                            mysourceID,
-                            widget.targetID,
+                            widget.target["id"],
                             "",
                           );
                           messagecontroller.clear();

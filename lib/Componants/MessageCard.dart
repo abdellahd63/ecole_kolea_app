@@ -5,14 +5,14 @@ import 'package:flutter/material.dart';
 class MessageCard extends StatelessWidget{
   String imgpath;
   String title;
-  String subTitle;
-  String UserID;
+  String type;
+  String TargetID;
   MessageCard({
     super.key,
     required this.imgpath,
     required this.title,
-    required this.subTitle,
-    required this.UserID
+    required this.type,
+    required this.TargetID
   });
 
   @override
@@ -23,10 +23,10 @@ class MessageCard extends StatelessWidget{
         child: ListTile(
           leading: Image.asset(imgpath),
           title: Text(title),
-          subtitle: Text(subTitle),
+          subtitle: Text(type),
         ),
         onTap: (){
-          Navigator.push(context, MaterialPageRoute(builder: (context)=>Chat(targetID: UserID, Title: title)));
+          Navigator.push(context, MaterialPageRoute(builder: (context)=>Chat(target: {"id":TargetID, "type":type}, Title: title)));
         },
       ),
     );
