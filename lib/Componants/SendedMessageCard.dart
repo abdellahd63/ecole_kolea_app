@@ -7,11 +7,13 @@ class SendedMessageCard extends StatelessWidget{
   String text;
   String time;
   bool type;
+  String? fullname;
   SendedMessageCard({
     super.key,
     required this.text,
     required this.time,
     required this.type,
+    this.fullname
   });
 
   @override
@@ -21,6 +23,16 @@ class SendedMessageCard extends StatelessWidget{
         child: Column(
           crossAxisAlignment: type ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
+            Padding(
+              padding: type ? const EdgeInsets.only(right: 10) : const EdgeInsets.only(left: 10),
+              child: Text(
+                fullname ?? '',
+                style: TextStyle(
+                  fontSize: 8,
+                  color: MyAppColors.gray400,
+                ),
+              ),
+            ),
           Card(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15)

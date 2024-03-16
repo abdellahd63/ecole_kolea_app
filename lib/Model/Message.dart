@@ -2,18 +2,20 @@ import 'package:ecole_kolea_app/Auth/AuthContext.dart';
 import 'package:flutter/material.dart';
 
 class Message {
-  String? id;
+  String? expediteurID;
   String? text;
   DateTime date;
   String type;
   String path;
+  String? fullname;
 
   Message({
     this.text,
     required this.date,
     required this.type,
     required this.path,
-    this.id,
+    this.expediteurID,
+    this.fullname
   });
 
   factory Message.fromJson(Map<String, dynamic> json) {
@@ -22,7 +24,8 @@ class Message {
       date: DateTime.parse(json['date_envoi']),
       type: json['expediteur'],
       path: '',
-      id: json['id'].toString()
+      expediteurID: json['expediteurID'],
+      fullname: json['expediteurName']
     );
   }
 }

@@ -144,6 +144,10 @@ class _ChatState extends State<Chat> {
         });
       }
     });
+    // Request join room when the chat screen is opened if is a room
+    if(widget.target["type"] == 'classe'){
+      socket.emit('joinRoom', widget.target["id"]);
+    }
   }
   @override
   void dispose() {
@@ -186,19 +190,19 @@ class _ChatState extends State<Chat> {
                 ),
               ),
               itemBuilder: (context, element) => Align(
-                alignment: element.type == mysourceType ? Alignment.centerRight : Alignment.centerLeft,
+                alignment: (element.expediteurID !=  null ? (element.expediteurID == mysourceID)  : (element.type == mysourceType)) ? Alignment.centerRight : Alignment.centerLeft,
                 child: element.path.isNotEmpty ?
                   MessageFileCard(
-                      type: element.type == mysourceType,
+                      type: element.expediteurID !=  null ? (element.expediteurID == mysourceID) : (element.type == mysourceType),
                       path: element.path
                   ) :
                   SendedMessageCard(
                       text: element.text ?? '',
                       time: element.date.toString().substring(10,16),
-                      type: element.type == mysourceType
+                      type: element.expediteurID !=  null ? (element.expediteurID == mysourceID)  : (element.type == mysourceType),
+                      fullname: element.fullname
                   ),
               ),
-
           )),
           Container(
             padding: EdgeInsets.symmetric(vertical: 05),
