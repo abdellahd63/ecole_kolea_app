@@ -127,4 +127,65 @@ class APIs {
       );
     }
   }
+  static Future CreateNewRoom(BuildContext context,
+      FiliereController,
+      SectionController,
+      GroupeController,
+      enseignantID) async {
+    try{
+      /*if(FiliereController.text.isEmpty ||
+          SectionController.text.isEmpty ||
+          GroupeController.text.isEmpty ||
+          enseignantID.isEmpty){
+        showTopSnackBar(
+          Overlay.of(context),
+          CustomSnackBar.info(
+            message: "Tous les champs doivent être remplis",
+          ),
+        );
+        return [];
+      }*/
+      final AuthContext authContext = context.read<AuthContext>();
+      final Map<String, dynamic>? userData = authContext.state.user;
+      final data = {
+        'Filiere': '1',
+        'Section': '1',
+        'Groupe': '1',
+        'enseignantID': '1'
+      };
+
+      final response = await http.post(
+        Uri.parse('${API_URL}/api/messagerie/create'),
+        body: jsonEncode(data),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${userData?['token'].toString() ?? ''}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        // Successful POST request
+        var responseData = json.decode(response.body);
+        return responseData;
+      } else {
+        // Handle the error in case of an unsuccessful request
+        var responseMessage = json.decode(response.body)['message'];
+        showTopSnackBar(
+          Overlay.of(context),
+          CustomSnackBar.error(
+            message: responseMessage,
+          ),
+        );
+        return [];
+      }
+    }catch(e){
+      print('Error during creating new room: $e');
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: "Vérifier votre internet!!",
+        ),
+      );
+    }
+  }
 }

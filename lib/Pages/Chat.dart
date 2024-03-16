@@ -60,7 +60,8 @@ class _ChatState extends State<Chat> {
       "sujet": '',
       "source": mysourceType,
       "path": path,
-      "type": mysourceType + widget.target["type"]
+      "type": mysourceType + widget.target["type"],
+      "class": '',
     });
   }
   void setMessage(String msg, String type, String path){
@@ -75,6 +76,19 @@ class _ChatState extends State<Chat> {
         messages.add(message);
       });
     }
+  }
+  void sendRoomMessage(String msg, String targetID, String path){
+    setMessage(msg, mysourceType, path);
+    socket.emit("message", {
+      "msg" : msg,
+      "sourceID": mysourceID,
+      "targetID": widget.target["id"],
+      "date": DateTime.now().toString(),
+      "sujet": '',
+      "source": mysourceType,
+      "path": path,
+      "type": 'class',
+    });
   }
   Future<void> sendIMG(File file) async {
     Message message = Message(
@@ -96,7 +110,8 @@ class _ChatState extends State<Chat> {
       "sujet": '',
       "source": mysourceType,
       "path": serverPath,
-      "type": mysourceType + widget.target["type"]
+      "type": mysourceType + widget.target["type"],
+      "class": '',
     });
   }
   @override
@@ -115,12 +130,12 @@ class _ChatState extends State<Chat> {
     socket.emit('getChatHistory', {
       "sourceID" : mysourceID,
       "targetID" : widget.target["id"],
-      "type" : mysourceType + widget.target["type"]
+      "type" : mysourceType + widget.target["type"],
+      "source" : mysourceType,
     });
     // Listen for chat history response from the server
     socket.on('chatHistory', (chatHistory) {
       if (mounted) {
-
         setState(() {
           // Update messages list with chat history
           if (chatHistory != null) {
@@ -138,7 +153,6 @@ class _ChatState extends State<Chat> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     
       appBar: AppBar(
         backgroundColor: MyAppColors.whitecolor,
         leading: InkWell(child: Icon(Icons.arrow_back_ios, color: MyAppColors.principalcolor,), onTap: () {
@@ -146,7 +160,6 @@ class _ChatState extends State<Chat> {
         },),
         title: Text(widget.Title, style: TextStyle(color: MyAppColors.principalcolor),),
       ),
-
       backgroundColor: MyAppColors.whitecolor,
       body: Column(
         children: [
@@ -182,7 +195,8 @@ class _ChatState extends State<Chat> {
                   SendedMessageCard(
                       text: element.text ?? '',
                       time: element.date.toString().substring(10,16),
-                      type: element.type == mysourceType),
+                      type: element.type == mysourceType
+                  ),
               ),
 
           )),
@@ -230,11 +244,17 @@ class _ChatState extends State<Chat> {
                       }
                     } else {
                       if (messagecontroller.text.isNotEmpty && sendButton) {
-                        sendMessage(
-                          messagecontroller.text,
-                          widget.target["id"],
-                          "",
-                        );
+                        widget.target["type"] == "classe" ?
+                          sendRoomMessage(
+                            messagecontroller.text,
+                            widget.target["id"],
+                            "",
+                          ) :
+                          sendMessage(
+                            messagecontroller.text,
+                            widget.target["id"],
+                            "",
+                          );
                         messagecontroller.clear();
                         setState(() {
                           sendButton = false;
@@ -281,6 +301,12 @@ class _ChatState extends State<Chat> {
                         }
                       } else {
                         if (messagecontroller.text.isNotEmpty && sendButton) {
+                          widget.target["type"] == "classe" ?
+                          sendRoomMessage(
+                            messagecontroller.text,
+                            widget.target["id"],
+                            "",
+                          ) :
                           sendMessage(
                             messagecontroller.text,
                             widget.target["id"],
