@@ -75,6 +75,7 @@ class APIs {
       );
     }
   }
+  //upload file in chat
   static Future uploadMyFile(BuildContext context, File? file)async {
     try {
       final AuthContext authContext = context.read<AuthContext>();
@@ -127,16 +128,18 @@ class APIs {
       );
     }
   }
+  //create new chat room
   static Future CreateNewRoom(BuildContext context,
       FiliereController,
       SectionController,
       GroupeController,
       enseignantID) async {
     try{
-      /*if(FiliereController.text.isEmpty ||
-          SectionController.text.isEmpty ||
-          GroupeController.text.isEmpty ||
+      if(FiliereController.isEmpty ||
+          SectionController.isEmpty ||
+          GroupeController.isEmpty ||
           enseignantID.isEmpty){
+        Navigator.of(context).pop();
         showTopSnackBar(
           Overlay.of(context),
           CustomSnackBar.info(
@@ -144,14 +147,14 @@ class APIs {
           ),
         );
         return [];
-      }*/
+      }
       final AuthContext authContext = context.read<AuthContext>();
       final Map<String, dynamic>? userData = authContext.state.user;
       final data = {
-        'Filiere': '1',
-        'Section': '1',
-        'Groupe': '1',
-        'enseignantID': '1'
+        'Filiere': FiliereController,
+        'Section': SectionController,
+        'Groupe': GroupeController,
+        'enseignantID': enseignantID
       };
 
       final response = await http.post(
@@ -166,10 +169,13 @@ class APIs {
       if (response.statusCode == 200) {
         // Successful POST request
         var responseData = json.decode(response.body);
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
         return responseData;
       } else {
         // Handle the error in case of an unsuccessful request
         var responseMessage = json.decode(response.body)['message'];
+        Navigator.of(context).pop();
         showTopSnackBar(
           Overlay.of(context),
           CustomSnackBar.error(
@@ -180,6 +186,7 @@ class APIs {
       }
     }catch(e){
       print('Error during creating new room: $e');
+      Navigator.of(context).pop();
       showTopSnackBar(
         Overlay.of(context),
         CustomSnackBar.error(
@@ -188,4 +195,36 @@ class APIs {
       );
     }
   }
+  //get filiere section groupe by id enseignant
+  static Future<Map<String, dynamic>> GetF_S_G_ByIDEnseignant(BuildContext context) async {
+    final AuthContext authContext = context.read<AuthContext>();
+    final Map<String, dynamic>? userData = authContext.state.user;
+    String IDEnseignant = userData?['id'].toString() ?? "";
+    try {
+      final response = await http.get(
+        Uri.parse('${API_URL}/api/filiere/All/byEnseignant/${IDEnseignant}'),
+        headers: {'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${userData?['token'] ?? ''}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> responseData = json.decode(response.body);
+        return responseData;
+      } else {
+        print('Error receiving Filieres/Sections/Groupes data: ${response.body}');
+      }
+    } catch (error) {
+      print('Error fetching Filieres/Sections/Groupes data: $error');
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: 'vérifier votre internet',
+        ),
+      );
+    }
+    // Return an empty list in case of an error
+    return {};
+  }
+
 }
