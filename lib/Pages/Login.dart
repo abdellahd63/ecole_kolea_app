@@ -1,9 +1,7 @@
 import 'package:ecole_kolea_app/APIs.dart';
 import 'package:ecole_kolea_app/Componants/LoginEdittext.dart';
 import 'package:ecole_kolea_app/Constantes/Colors.dart';
-import 'package:ecole_kolea_app/Pages/ConnectedHomePage.dart';
 import 'package:ecole_kolea_app/Pages/DeconnectedHomepage.dart';
-import 'package:ecole_kolea_app/Pages/Presentation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

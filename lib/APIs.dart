@@ -1,22 +1,22 @@
 import 'dart:io';
 
-import 'package:ecole_kolea_app/Auth/AuthContext.dart';
-import 'package:ecole_kolea_app/Auth/UseAuthContext.dart';
 import 'package:ecole_kolea_app/Constant.dart';
 import 'package:ecole_kolea_app/Pages/ConnectedHomePage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:core';
-import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 class APIs {
   static const API_URL = Constant.URL;
+  static List<int> extractIds(List<dynamic> data) {
+    return data.map<int>((item) => item['id'] as int).toList();
+  }
+
   // login
-  static Future<void> signIn(BuildContext context,
-      UserNameController,
-      PasswordController) async {
+  static Future<void> signIn(BuildContext context, UserNameController, PasswordController) async {
     try{
       if(UserNameController.text.isEmpty ||
           PasswordController.text.isEmpty ){
@@ -44,12 +44,15 @@ class APIs {
         var responseData = json.decode(response.body);
         //save responseData to local storage
         Map<String, dynamic> user = responseData;
-        final AuthContext authContext = useAuthContext(context);
-        authContext.login(user);
-        // redirect to vente page
-        final AuthContext auth = context.read<AuthContext>();
-        final Map<String, dynamic>? userData = auth.state.user;
-        if (userData != null) {
+        //add user to SharedPreferences
+        final SharedPreferences preferences = await SharedPreferences.getInstance();
+        preferences.setString("id", user["id"].toString());
+        preferences.setString("token", user["token"].toString());
+        preferences.setString("type", user["type"].toString());
+
+        if (preferences.getString("id") != null &&
+            preferences.getString("type") != null &&
+            preferences.getString("token") != null) {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => ConnectedHomePage()),
@@ -78,12 +81,10 @@ class APIs {
   //upload file in chat
   static Future uploadMyFile(BuildContext context, File? file)async {
     try {
-      final AuthContext authContext = context.read<AuthContext>();
-      final Map<String, dynamic>? userData = authContext.state.user;
-      String token = userData?['token'].toString() ?? "";
+      final SharedPreferences preferences = await SharedPreferences.getInstance();
 
       var request = http.MultipartRequest('POST', Uri.parse('$API_URL/api/user/uploadFile'));
-      request.headers['Authorization'] = 'Bearer $token';
+      request.headers['Authorization'] = 'Bearer ${preferences.getString("token").toString()}';
 
       // Append fields to the request
       if (file != null) {
@@ -129,11 +130,7 @@ class APIs {
     }
   }
   //create new chat room
-  static Future CreateNewRoom(BuildContext context,
-      FiliereController,
-      SectionController,
-      GroupeController,
-      enseignantID) async {
+  static Future CreateNewRoom(BuildContext context, FiliereController, SectionController, GroupeController, enseignantID) async {
     try{
       if(FiliereController.isEmpty ||
           SectionController.isEmpty ||
@@ -148,8 +145,8 @@ class APIs {
         );
         return [];
       }
-      final AuthContext authContext = context.read<AuthContext>();
-      final Map<String, dynamic>? userData = authContext.state.user;
+      final SharedPreferences preferences = await SharedPreferences.getInstance();
+
       final data = {
         'Filiere': FiliereController,
         'Section': SectionController,
@@ -162,7 +159,7 @@ class APIs {
         body: jsonEncode(data),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ${userData?['token'].toString() ?? ''}',
+          'Authorization': 'Bearer ${preferences.getString("token").toString()}',
         },
       );
 
@@ -197,14 +194,14 @@ class APIs {
   }
   //get filiere section groupe by id enseignant
   static Future<Map<String, dynamic>> GetF_S_G_ByIDEnseignant(BuildContext context) async {
-    final AuthContext authContext = context.read<AuthContext>();
-    final Map<String, dynamic>? userData = authContext.state.user;
-    String IDEnseignant = userData?['id'].toString() ?? "";
     try {
+      final SharedPreferences preferences = await SharedPreferences.getInstance();
+      String IDEnseignant = preferences.getString("id").toString();
+
       final response = await http.get(
         Uri.parse('${API_URL}/api/filiere/All/byEnseignant/${IDEnseignant}'),
         headers: {'Content-Type': 'application/json',
-          'Authorization': 'Bearer ${userData?['token'] ?? ''}',
+          'Authorization': 'Bearer ${preferences.getString("token").toString()}',
         },
       );
 
@@ -226,5 +223,204 @@ class APIs {
     // Return an empty list in case of an error
     return {};
   }
+  //get specific student by id
+  static Future<Map<String, dynamic>> GetStudentByID(BuildContext context) async {
+    try {
+      final SharedPreferences preferences = await SharedPreferences.getInstance();
 
+      Map<String, dynamic> studentData = {};
+
+      final response = await http.get(
+        Uri.parse('${API_URL}/api/etudiant/${preferences.getString("id").toString()}'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${preferences.getString("token").toString()}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        studentData = data;
+        return studentData;
+      } else {
+        print('Error receiving student data: ${response.body}');
+      }
+    } catch (error) {
+      print('Error receiving student data: $error');
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: 'vérifier votre internet',
+        ),
+      );
+    }
+    // Return an empty map in case of an error
+    return {};
+  }
+  //get all students
+  static Future<List<dynamic>> GetAllStudents(BuildContext context) async {
+    try {
+      final SharedPreferences preferences = await SharedPreferences.getInstance();
+
+      var StudentsData = <dynamic>[];
+
+      final response = await http.get(
+        Uri.parse('${API_URL}/api/etudiant'),
+        headers: {'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${preferences.getString("token").toString()}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        StudentsData = data;
+        return StudentsData.toList();
+      } else {
+        print('Error receiving all students data: ${response.body}');
+      }
+    } catch (error) {
+      print('Error receiving all students data: $error');
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: 'vérifier votre internet',
+        ),
+      );
+    }
+    // Return an empty list in case of an error
+    return [];
+  }
+  //get all users
+  static Future<List<dynamic>> GetAllUsers(BuildContext context) async {
+    try {
+      final SharedPreferences preferences = await SharedPreferences.getInstance();
+
+      var UsersData = <dynamic>[];
+
+      final response = await http.get(
+        Uri.parse('${API_URL}/api/user/All'),
+        headers: {'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${preferences.getString("token").toString()}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        UsersData = data;
+        return UsersData.toList();
+      } else {
+        print('Error receiving users data: ${response.body}');
+      }
+    } catch (error) {
+      print('Error receiving users data: $error');
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: 'vérifier votre internet',
+        ),
+      );
+    }
+    // Return an empty list in case of an error
+    return [];
+  }
+  //get all students by groupe ids
+  static Future<List<dynamic>> GetStudentsByGroup(BuildContext context, List<dynamic> groupes) async {
+    try {
+      final SharedPreferences preferences = await SharedPreferences.getInstance();
+
+      var StudentsData = <dynamic>[];
+      List<int> ids = extractIds(groupes);
+      final response = await http.get(
+        Uri.parse('${API_URL}/api/etudiant/All/ByGroupes/${ids}'),
+        headers: {'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${preferences.getString("token").toString()}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        StudentsData = data;
+        return StudentsData.toList();
+      } else {
+        print('Error receiving students data: ${response.body}');
+      }
+    } catch (error) {
+      print('Error receiving students data: $error');
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: 'vérifier votre internet',
+        ),
+      );
+    }
+    // Return an empty list in case of an error
+    return [];
+  }
+  //get all Teachers by groupe id
+  static Future<List<dynamic>> GetTeachersByGroup(BuildContext context, String groupe) async {
+    try {
+      final SharedPreferences preferences = await SharedPreferences.getInstance();
+
+      var TeachersData = <dynamic>[];
+
+      final response = await http.get(
+        Uri.parse('${API_URL}/api/enseignant/All/ByGroupeID/${groupe}'),
+        headers: {'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${preferences.getString("token").toString()}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        TeachersData = data;
+        return TeachersData.toList();
+      } else {
+        print('Error receiving teachers data: ${response.body}');
+      }
+    } catch (error) {
+      print('Error receiving teachers data: $error');
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: 'vérifier votre internet',
+        ),
+      );
+    }
+    // Return an empty list in case of an error
+    return [];
+  }
+  //get all classes messagerie by id Enseignant
+  static Future<List<dynamic>> GetClasseChatByIDEnseignant(BuildContext context) async {
+    try {
+      final SharedPreferences preferences = await SharedPreferences.getInstance();
+      String ID = preferences.getString("id").toString();
+      String Type = preferences.getString("type").toString();
+
+      var ClassesData = <dynamic>[];
+      final response = await http.get(
+        Uri.parse('${API_URL}/api/messagerie/All/Classe/ByIDEnseignant/${ID}/${Type}'),
+        headers: {'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${preferences.getString("token").toString()}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        ClassesData = data;
+        return ClassesData.toList();
+      } else {
+        print('Error receiving classes chat data: ${response.body}');
+      }
+    } catch (error) {
+      print('Error receiving classes chat data: $error');
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: 'vérifier votre internet',
+        ),
+      );
+    }
+    // Return an empty list in case of an error
+    return [];
+  }
 }

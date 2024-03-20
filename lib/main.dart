@@ -1,19 +1,28 @@
-import 'package:ecole_kolea_app/Auth/AuthContextProvider.dart';
-import 'package:ecole_kolea_app/Constantes/Colors.dart';
-import 'package:ecole_kolea_app/Pages/DeconnectedHomepage.dart';
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'dart:io';
 
-void main() {
+import 'package:ecole_kolea_app/Constantes/Colors.dart';
+import 'package:ecole_kolea_app/Pages/ConnectedHomePage.dart';
+import 'package:ecole_kolea_app/Pages/DeconnectedHomepage.dart';
+import 'package:ecole_kolea_app/controllers/SocketController.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  final SharedPreferences preferences = await SharedPreferences.getInstance();
+  final SocketController socketController = Get.put(SocketController());
+
   runApp(
-      AuthContextProvider(
-        child: MyApp(),
-      )
+      MyApp(token: preferences.getString("token"))
   );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final token;
+  const MyApp({super.key, required this.token});
 
   // This widget is the root of your application.
   @override
@@ -26,7 +35,7 @@ class MyApp extends StatelessWidget {
         textTheme: GoogleFonts.poppinsTextTheme(),
       ),
       debugShowCheckedModeBanner: false,
-      home: DeconnectedHomePage(),
+      home: (token != null && JwtDecoder.isExpired(token) == false) ? ConnectedHomePage() : DeconnectedHomePage(),
     );
   }
 }

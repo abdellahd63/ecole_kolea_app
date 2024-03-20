@@ -1,18 +1,19 @@
 import 'dart:io';
 
 import 'package:ecole_kolea_app/APIs.dart';
-import 'package:ecole_kolea_app/Auth/AuthContext.dart';
 import 'package:ecole_kolea_app/Componants/MessageFileCard.dart';
 import 'package:ecole_kolea_app/Componants/SendedMessageCard.dart';
 import 'package:ecole_kolea_app/Constant.dart';
 import 'package:ecole_kolea_app/Constantes/Colors.dart';
 import 'package:ecole_kolea_app/Model/Message.dart';
+import 'package:ecole_kolea_app/controllers/SocketController.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
@@ -28,6 +29,7 @@ class Chat extends StatefulWidget {
 
 class _ChatState extends State<Chat> {
   TextEditingController messagecontroller=new TextEditingController();
+  final SocketController socketController = Get.put(SocketController());
   late IO.Socket socket;
   bool sendButton = false;
   String mysourceID = "";
@@ -35,7 +37,7 @@ class _ChatState extends State<Chat> {
   List<Message> messages=[];
   ImagePicker imagePicker = ImagePicker();
   XFile? file;
-  void connecte(){
+  Future<void> connecte() async {
     socket = IO.io(Constant.URL, <String,dynamic>{
       "transports":["websocket"],
       "autoConnect": false,
@@ -47,7 +49,6 @@ class _ChatState extends State<Chat> {
         setMessage(msg["msg"], "destination", msg["path"]);
       }
       );
-
     });
   }
   void sendMessage(String msg, String targetID, String path){
@@ -64,19 +65,6 @@ class _ChatState extends State<Chat> {
       "class": '',
     });
   }
-  void setMessage(String msg, String type, String path){
-    Message message = Message(
-        text: msg,
-        date: DateTime.now(),
-        type: type,
-        path: path != null ? path.toString() : ""
-    );
-    if(mounted) {
-      setState(() {
-        messages.add(message);
-      });
-    }
-  }
   void sendRoomMessage(String msg, String targetID, String path){
     setMessage(msg, mysourceType, path);
     socket.emit("message", {
@@ -89,6 +77,19 @@ class _ChatState extends State<Chat> {
       "path": path,
       "type": 'class',
     });
+  }
+  void setMessage(String msg, String type, String path){
+    Message message = Message(
+        text: msg,
+        date: DateTime.now(),
+        type: type,
+        path: path != null ? path.toString() : ""
+    );
+    if(mounted) {
+      setState(() {
+        messages.add(message);
+      });
+    }
   }
   Future<void> sendIMG(File file) async {
     Message message = Message(
@@ -114,16 +115,11 @@ class _ChatState extends State<Chat> {
       "class": '',
     });
   }
-  @override
-  void initState() {
-    super.initState();
-    final AuthContext authContext = context.read<AuthContext>();
-    final Map<String, dynamic>? userData = authContext.state.user;
+  Future<void> fetchCurrentUserData() async {
+    final SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
-      mysourceID = userData?['id'].toString() ?? "";
-    });
-    setState(() {
-      mysourceType = userData?['type'].toString() ?? "";
+      mysourceID = preferences.getString("id").toString();
+      mysourceType = preferences.getString("type").toString();
     });
     connecte();
     // Request chat history when the chat screen is opened
@@ -150,6 +146,11 @@ class _ChatState extends State<Chat> {
     }
   }
   @override
+  void initState(){
+    super.initState();
+    fetchCurrentUserData();
+  }
+  @override
   void dispose() {
     socket.disconnect();
     super.dispose();
@@ -171,7 +172,7 @@ class _ChatState extends State<Chat> {
             child: GroupedListView<Message, DateTime>(
               reverse: true,
               order: GroupedListOrder.DESC,
-              elements: messages, 
+              elements: messages,
               groupBy: (Message element)=>DateTime(
                 element.date.year,
                 element.date.month,
@@ -203,6 +204,8 @@ class _ChatState extends State<Chat> {
                       fullname: element.fullname
                   ),
               ),
+              itemComparator: (Message message1, Message message2) =>
+                  message1.date.compareTo(message2.date),
           )),
           Container(
             padding: EdgeInsets.symmetric(vertical: 05),

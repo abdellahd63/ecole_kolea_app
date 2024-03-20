@@ -1,6 +1,3 @@
-import 'package:ecole_kolea_app/Auth/AuthContext.dart';
-import 'package:flutter/material.dart';
-
 class Message {
   String? expediteurID;
   String? text;

@@ -12,4 +12,12 @@ class User{
     required this.type,
     this.section
   });
-}
+
+  factory User.fromJson(Map<String, dynamic> json, String type) {
+    return User(
+      id: json['id'],
+      nom: json['nom'],
+      prenom: json['prenom'],
+      type: type,
+    );
+  }}

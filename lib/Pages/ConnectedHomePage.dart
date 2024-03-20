@@ -1,5 +1,4 @@
 
-import 'package:ecole_kolea_app/Auth/AuthContext.dart';
 import 'package:ecole_kolea_app/Constantes/Colors.dart';
 import 'package:ecole_kolea_app/Pages/Bibiotheque.dart';
 import 'package:ecole_kolea_app/Pages/Contact.dart';
@@ -7,7 +6,6 @@ import 'package:ecole_kolea_app/Pages/DeconnectedHomepage.dart';
 import 'package:ecole_kolea_app/Pages/Doleance.dart';
 import 'package:ecole_kolea_app/Pages/Evaluation.dart';
 import 'package:ecole_kolea_app/Pages/Filiere.dart';
-import 'package:ecole_kolea_app/Pages/Login.dart';
 import 'package:ecole_kolea_app/Pages/Notifications.dart';
 import 'package:ecole_kolea_app/Pages/Presence.dart';
 import 'package:ecole_kolea_app/Pages/Presentation.dart';
@@ -15,7 +13,7 @@ import 'package:ecole_kolea_app/Pages/Profil.dart';
 import 'package:ecole_kolea_app/Pages/Programmes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ConnectedHomePage extends StatefulWidget {
   const ConnectedHomePage({super.key});
@@ -232,13 +230,19 @@ class _DeconnectedHomePageState extends State<ConnectedHomePage> {
                       fontWeight: FontWeight.bold,
                     ),
               ),
-              onTap: (){
-                final AuthContext authContext = context.read<AuthContext>();
-                authContext.logout();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => DeconnectedHomePage()),
-                );
+              onTap: () async {
+                final SharedPreferences preferences = await SharedPreferences.getInstance();
+                preferences.remove("id");
+                preferences.remove("token");
+                preferences.remove("type");
+                if (preferences.getString("id") == null &&
+                    preferences.getString("type") == null &&
+                    preferences.getString("token") == null) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => DeconnectedHomePage()),
+                  );
+                }
               },
             ),
         ]),

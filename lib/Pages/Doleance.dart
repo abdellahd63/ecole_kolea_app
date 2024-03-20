@@ -1,11 +1,12 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:ecole_kolea_app/APIs.dart';
-import 'package:ecole_kolea_app/Auth/AuthContext.dart';
 import 'package:ecole_kolea_app/Componants/MessageCard.dart';
 import 'package:ecole_kolea_app/Constantes/Colors.dart';
+import 'package:ecole_kolea_app/Model/ClasseChat.dart';
 import 'package:ecole_kolea_app/Model/User.dart';
+import 'package:ecole_kolea_app/Model/UserAdmin.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Doleance extends StatefulWidget {
   const Doleance({super.key});
@@ -19,44 +20,18 @@ class _DoleanceState extends State<Doleance> {
 
   String mysourceID = "";
   String mysourceType = "";
+
   String? selectedFiliere;
   String? selectedSection;
   String? selectedGroupe;
-  Map<String, dynamic> itemsData = {};
+
   List<dynamic> Filiereitems = [];
   List<dynamic> Sectionitems = [];
   List<dynamic> Groupeitems = [];
 
-  List<User> users=[];
-  @override
-  void initState() {
-    final AuthContext authContext = context.read<AuthContext>();
-    final Map<String, dynamic>? userData = authContext.state.user;
-    _fetchFilieres_Sections_Groupes();
-    setState(() {
-      mysourceID = userData?['id'].toString() ?? "";
-      mysourceType = userData?['type'].toString() ?? "";
-      users = [
-        User(id: 1, nom: "boumrar", prenom: "zineeddine", type: "enseignant"),
-        User(id: 2, nom: "dekkiche", prenom: "abdallah", type: "etudiant"),
-        User(id: 3, nom: "khaldi", prenom: "abdelmoumen", type: "etudiant"),
-        User(id: 4, nom: "hakem", prenom: "yassine", type: "user"),
-        User(id: 5, nom: "nouar", prenom: "lokmane", type: "etudiant"),
-        User(id: 6, nom: "aguibi", prenom: "younes", type: "user"),
-      ];
-    });
-  }
-  Future<void> _fetchFilieres_Sections_Groupes() async {
-    final data = await APIs.GetF_S_G_ByIDEnseignant(context);
-    setState(() {
-      Filiereitems = data["filieres"] ?? [];
-      Sectionitems = data["sections"] ?? [];
-      Groupeitems = data["groupes"] ?? [];
-    });
-    print(data["filieres"]);
-    print(data["sections"]);
-    print(data["groupes"]);
-  }
+  List<User> users= [];
+  List<ClasseChat> classes= [];
+
   Future<void> createNewRoom(FiliereController, SectionController, GroupeController) async {
     Map<String, dynamic> room = await APIs.CreateNewRoom(
         context,
@@ -71,6 +46,43 @@ class _DoleanceState extends State<Doleance> {
       });
     }
   }
+  Future<void> fetchCurrentUserData() async {
+    final SharedPreferences preferences = await SharedPreferences.getInstance();
+    setState(() {
+      mysourceID = preferences.getString("id").toString();
+      mysourceType = preferences.getString("type").toString();
+    });
+    if(mysourceType == 'enseignant'){
+      final F_S_G_ByIDEnseignantData = await APIs.GetF_S_G_ByIDEnseignant(context);
+      final StudentsByGroupData = await APIs.GetStudentsByGroup(context, F_S_G_ByIDEnseignantData["groupes"]);
+      final UsersData = await APIs.GetAllUsers(context);
+      setState(() {
+        Filiereitems = F_S_G_ByIDEnseignantData["filieres"] ?? [];
+        Sectionitems = F_S_G_ByIDEnseignantData["sections"] ?? [];
+        Groupeitems = F_S_G_ByIDEnseignantData["groupes"] ?? [];
+        users = StudentsByGroupData.map<User>((item) => User.fromJson(item, 'etudiant')).toList();
+      });
+    }
+    if(mysourceType == 'etudiant'){
+      final StudentData = await APIs.GetStudentByID(context);
+      final TeachersByGroupData = await APIs.GetTeachersByGroup(context, StudentData['groupe'].toString());
+      setState(() {
+        users = TeachersByGroupData.map<User>((item) => User.fromJson(item, 'enseignant')).toList();
+      });
+    }
+    if(mysourceType == 'user'){
+      final AllStudentsData = await APIs.GetAllStudents(context);
+      setState(() {
+        users = AllStudentsData.map<User>((item) => User.fromJson(item, 'etudiant')).toList();
+      });
+    }
+
+  }
+  @override
+  void initState(){
+    fetchCurrentUserData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -520,6 +532,116 @@ class _DoleanceState extends State<Doleance> {
             ),
           ),
           Divider(),
+          SizedBox(height: 10),
+          if (mysourceType != 'user') Padding(
+            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Classes',
+                style: TextStyle(
+                    color: MyAppColors.gray400,
+                    fontSize: 12
+                ),
+              ),
+            ),
+          ),
+          if (mysourceType != 'user') Expanded(
+            child: FutureBuilder<List<dynamic>>(
+              future: APIs.GetClasseChatByIDEnseignant(context),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Container(
+                      child: Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            CircularProgressIndicator(),
+                          ],
+                        ),)
+                  ); // or any loading indicator
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Text('Aucun classe chat disponible.');
+                } else {
+                  List<ClasseChat> ClasseChatData = List<ClasseChat>.from(snapshot.data!.map<ClasseChat>((item) => ClasseChat.fromJson(item)));
+                  return ListView.builder(
+                    itemCount: ClasseChatData.length,
+                    itemBuilder: (context, index) {
+                      return MessageCard(
+                        imgpath: 'lib/Assets/Images/noprofilpic.png',
+                        title: ClasseChatData[index].filiere +" "+ ClasseChatData[index].groupe,
+                        type: ClasseChatData[index].type,
+                        TargetID: ClasseChatData[index].id.toString(),
+                      );
+                    },
+                  );
+                }
+              },
+            ),
+          ),
+          if (mysourceType == 'etudiant') Padding(
+            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Users',
+                style: TextStyle(
+                    color: MyAppColors.gray400,
+                    fontSize: 12
+                ),
+              ),
+            ),
+          ),
+          if (mysourceType == 'etudiant') Expanded(
+            child: FutureBuilder<List<dynamic>>(
+              future: APIs.GetAllUsers(context),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Container(
+                      child: Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            CircularProgressIndicator(),
+                          ],
+                        ),)
+                  ); // or any loading indicator
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Text('Aucun user disponible.');
+                } else {
+                  List<UserAdmin> ClasseChatData = List<UserAdmin>.from(snapshot.data!.map<UserAdmin>((item) => UserAdmin.fromJson(item, 'user')));
+                  return ListView.builder(
+                    itemCount: ClasseChatData.length,
+                    itemBuilder: (context, index) {
+                      return MessageCard(
+                        imgpath: 'lib/Assets/Images/noprofilpic.png',
+                        title: ClasseChatData[index].id.toString() +" "+ ClasseChatData[index].role.toString(),
+                        type: ClasseChatData[index].type.toString(),
+                        TargetID: ClasseChatData[index].id.toString(),
+                      );
+                    },
+                  );
+                }
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Indeviduals',
+                style: TextStyle(
+                    color: MyAppColors.gray400,
+                    fontSize: 12
+                ),
+              ),
+            ),
+          ),
           Expanded(
             child: ListView.builder(
               itemCount: users.length,
