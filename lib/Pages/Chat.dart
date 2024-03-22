@@ -6,10 +6,8 @@ import 'package:ecole_kolea_app/Componants/SendedMessageCard.dart';
 import 'package:ecole_kolea_app/Constant.dart';
 import 'package:ecole_kolea_app/Constantes/Colors.dart';
 import 'package:ecole_kolea_app/Model/Message.dart';
-import 'package:ecole_kolea_app/controllers/SocketController.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -29,7 +27,6 @@ class Chat extends StatefulWidget {
 
 class _ChatState extends State<Chat> {
   TextEditingController messagecontroller=new TextEditingController();
-  final SocketController socketController = Get.put(SocketController());
   late IO.Socket socket;
   bool sendButton = false;
   String mysourceID = "";
@@ -37,23 +34,20 @@ class _ChatState extends State<Chat> {
   List<Message> messages=[];
   ImagePicker imagePicker = ImagePicker();
   XFile? file;
-  Future<void> connecte() async {
-    socket = IO.io(Constant.URL, <String,dynamic>{
-      "transports":["websocket"],
-      "autoConnect": false,
-    });
-    socket.connect();
-    socket.emit("signin", mysourceID);
-    socket.onConnect((data) {
-      socket.on("replyMessage", (msg) {
-        setMessage(msg["msg"], "destination", msg["path"]);
-      }
-      );
-    });
-  }
   void sendMessage(String msg, String targetID, String path){
     setMessage(msg, mysourceType, path);
     socket.emit("message", {
+      "msg" : msg,
+      "sourceID": mysourceID,
+      "targetID": targetID,
+      "date": DateTime.now().toString(),
+      "sujet": '',
+      "source": mysourceType,
+      "path": path,
+      "type": mysourceType + widget.target["type"],
+      "class": '',
+    });
+    socket.emit('notification', {
       "msg" : msg,
       "sourceID": mysourceID,
       "targetID": targetID,
@@ -115,13 +109,19 @@ class _ChatState extends State<Chat> {
       "class": '',
     });
   }
-  Future<void> fetchCurrentUserData() async {
+  Future<void> connecte() async {
     final SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
       mysourceID = preferences.getString("id").toString();
       mysourceType = preferences.getString("type").toString();
     });
-    connecte();
+    socket = IO.io(Constant.URL, <String,dynamic>{
+      "transports":["websocket"],
+      "autoConnect": false,
+      'force new connection': true,
+    });
+    socket.connect();
+    socket.emit("signin", mysourceID);
     // Request chat history when the chat screen is opened
     socket.emit('getChatHistory', {
       "sourceID" : mysourceID,
@@ -140,18 +140,28 @@ class _ChatState extends State<Chat> {
         });
       }
     });
+    // Listen for reply message response from the server
+    socket.onConnect((data) {
+      socket.on("replyMessage", (msg) {
+        setMessage(msg["msg"], "destination", msg["path"]);
+      });
+    });
     // Request join room when the chat screen is opened if is a room
     if(widget.target["type"] == 'classe'){
       socket.emit('joinRoom', widget.target["id"]);
     }
   }
+
   @override
   void initState(){
     super.initState();
-    fetchCurrentUserData();
+    connecte();
   }
+
   @override
-  void dispose() {
+  void dispose() async{
+    print(mysourceID);
+    socket.emit("signout", mysourceID);
     socket.disconnect();
     super.dispose();
   }

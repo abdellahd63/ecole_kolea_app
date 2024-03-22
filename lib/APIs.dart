@@ -130,11 +130,11 @@ class APIs {
     }
   }
   //create new chat room
-  static Future CreateNewRoom(BuildContext context, FiliereController, SectionController, GroupeController, enseignantID) async {
+  static Future<Map<String, dynamic>> CreateNewRoom(BuildContext context, FiliereController, SectionController, GroupeController, enseignantID) async {
     try{
-      if(FiliereController.isEmpty ||
-          SectionController.isEmpty ||
-          GroupeController.isEmpty ||
+      if(FiliereController != null || FiliereController.isEmpty ||
+          SectionController != null || SectionController.isEmpty ||
+          GroupeController != null || GroupeController.isEmpty ||
           enseignantID.isEmpty){
         Navigator.of(context).pop();
         showTopSnackBar(
@@ -143,7 +143,7 @@ class APIs {
             message: "Tous les champs doivent être remplis",
           ),
         );
-        return [];
+        return {};
       }
       final SharedPreferences preferences = await SharedPreferences.getInstance();
 
@@ -179,7 +179,7 @@ class APIs {
             message: responseMessage,
           ),
         );
-        return [];
+        return {};
       }
     }catch(e){
       print('Error during creating new room: $e');
@@ -191,6 +191,7 @@ class APIs {
         ),
       );
     }
+    return {};
   }
   //get filiere section groupe by id enseignant
   static Future<Map<String, dynamic>> GetF_S_G_ByIDEnseignant(BuildContext context) async {

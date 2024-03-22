@@ -51,6 +51,10 @@ dependencies:
   get: ^4.1.4
   shared_preferences: ^2.2.2
   jwt_decoder: ^2.0.1
+  workmanager: ^0.5.2
+  flutter_local_notifications: ^17.0.0
+  flutter_background: ^1.2.0
+  permission_handler: ^11.0.1
 
 dev_dependencies:
   flutter_test:
