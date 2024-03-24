@@ -78,6 +78,7 @@ class APIs {
       );
     }
   }
+
   //upload file in chat
   static Future uploadMyFile(BuildContext context, File? file)async {
     try {
@@ -129,6 +130,7 @@ class APIs {
       );
     }
   }
+
   //create new chat room
   static Future<Map<String, dynamic>> CreateNewRoom(BuildContext context, FiliereController, SectionController, GroupeController, enseignantID) async {
     try{
@@ -193,6 +195,7 @@ class APIs {
     }
     return {};
   }
+
   //get filiere section groupe by id enseignant
   static Future<Map<String, dynamic>> GetF_S_G_ByIDEnseignant(BuildContext context) async {
     try {
@@ -390,6 +393,7 @@ class APIs {
     // Return an empty list in case of an error
     return [];
   }
+
   //get specific user by id
   static Future<Map<String, dynamic>> GetUserByID(BuildContext context) async {
     try {
@@ -458,7 +462,7 @@ class APIs {
     // Return an empty map in case of an error
     return {};
   }
-//get specific student by id
+  //get specific student by id
   static Future<Map<String, dynamic>> GetStudentByID(BuildContext context) async {
     try {
       final SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -475,7 +479,6 @@ class APIs {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        print(data);
         studentData = data;
         return studentData;
       } else {
@@ -492,5 +495,108 @@ class APIs {
     }
     // Return an empty map in case of an error
     return {};
+  }
+
+  //get all the bibliotheques
+  static Future<List<dynamic>> GetAllBibliotheques(BuildContext context) async {
+    try {
+      final SharedPreferences preferences = await SharedPreferences.getInstance();
+
+      List<dynamic> bibliothequesData = [];
+
+      final response = await http.get(
+        Uri.parse('${API_URL}/api/bibliotheque/All'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${preferences.getString("token").toString()}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        bibliothequesData = data;
+        return bibliothequesData;
+      } else {
+        print('Error receiving bibliotheque data: ${response.body}');
+      }
+    } catch (error) {
+      print('Error receiving bibliotheque data: $error');
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: 'vérifier votre internet',
+        ),
+      );
+    }
+    // Return an empty map in case of an error
+    return [];
+  }
+  //get all the categories of a bibliotheque
+  static Future<List<dynamic>> GetAllCategoriesByIDBibliotheques(BuildContext context, String id) async {
+    try {
+      final SharedPreferences preferences = await SharedPreferences.getInstance();
+
+      List<dynamic> categoriesData = [];
+
+      final response = await http.get(
+        Uri.parse('${API_URL}/api/categorie/All/${id}'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${preferences.getString("token").toString()}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        categoriesData = data;
+        return categoriesData;
+      } else {
+        print('Error receiving categorie data: ${response.body}');
+      }
+    } catch (error) {
+      print('Error receiving categorie data: $error');
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: 'vérifier votre internet',
+        ),
+      );
+    }
+    // Return an empty map in case of an error
+    return [];
+  }
+  //get all documents of a categorie
+  static Future<List<dynamic>> GetAllDocumentsByIDCategorie(BuildContext context, String id) async {
+    try {
+      final SharedPreferences preferences = await SharedPreferences.getInstance();
+
+      List<dynamic> documentsData = [];
+
+      final response = await http.get(
+        Uri.parse('${API_URL}/api/document/All/${id}'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${preferences.getString("token").toString()}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        documentsData = data;
+        return documentsData;
+      } else {
+        print('Error receiving document data: ${response.body}');
+      }
+    } catch (error) {
+      print('Error receiving document data: $error');
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: 'vérifier votre internet',
+        ),
+      );
+    }
+    // Return an empty map in case of an error
+    return [];
   }
 }

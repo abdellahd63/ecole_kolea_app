@@ -1,41 +1,39 @@
 import 'package:ecole_kolea_app/APIs.dart';
 import 'package:ecole_kolea_app/Constantes/Colors.dart';
-import 'package:ecole_kolea_app/Model/Bibliotheque.dart';
-import 'package:ecole_kolea_app/Pages/Categorie.dart';
+import 'package:ecole_kolea_app/Model/CategorieModel.dart';
+import 'package:ecole_kolea_app/Pages/Livres.dart';
 import 'package:flutter/material.dart';
 
-class Bibiotheque extends StatelessWidget {
-  Bibiotheque({super.key});
-
+class Categorie extends StatelessWidget {
+  Categorie({super.key, required this.bibliotheque, required this.name});
+  final String bibliotheque;
+  final String name;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text('${name}',
+          textAlign: TextAlign.center,
+          softWrap: true,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: MyAppColors.principalcolor,
+            fontSize: 18,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        iconTheme: IconThemeData(color: MyAppColors.principalcolor),
+      ),
       backgroundColor: MyAppColors.whitecolor,
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("Bibliotheque",
-                    textAlign: TextAlign.center,
-                    softWrap: true,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: MyAppColors.principalcolor,
-                      fontSize: 18,
-                      overflow: TextOverflow.ellipsis,
-
-                    ),
-                  ),
-                ],
-              ),
               SizedBox(height: 20,),
               FutureBuilder<List<dynamic>>(
-                future: APIs.GetAllBibliotheques(context),
+                future: APIs.GetAllCategoriesByIDBibliotheques(context, bibliotheque),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Container(
@@ -50,12 +48,12 @@ class Bibiotheque extends StatelessWidget {
                   } else if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}');
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Text('Aucune bibliotheque disponible.');
+                    return Text('Aucune categorie disponible.');
                   } else {
-                    List<Bibliotheque> bibliothequeData = List<Bibliotheque>.from(snapshot.data!.map<Bibliotheque>((item) => Bibliotheque.fromJson(item)));
+                    List<CategorieModel> categorieData = List<CategorieModel>.from(snapshot.data!.map<CategorieModel>((item) => CategorieModel.fromJson(item)));
                     return ListView.builder(
                       shrinkWrap: true,
-                      itemCount: bibliothequeData.length,
+                      itemCount: categorieData.length,
                       itemBuilder: (context, index) {
                         return InkWell(
                           child: Container(
@@ -68,7 +66,7 @@ class Bibiotheque extends StatelessWidget {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(bibliothequeData[index].libelle,
+                                Text(categorieData[index].libelle,
                                   style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.w600
@@ -78,7 +76,7 @@ class Bibiotheque extends StatelessWidget {
                             ),
                           ),
                           onTap: (){
-                            Navigator.of(context).push(MaterialPageRoute(builder: (context)=>Categorie(bibliotheque: bibliothequeData[index].id.toString(), name: bibliothequeData[index].libelle.toString())));
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context)=>Livres(Categorie: categorieData[index].id.toString(), name: categorieData[index].libelle.toString())));
                           },
                         );
                       },
