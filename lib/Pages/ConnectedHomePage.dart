@@ -19,10 +19,10 @@ class ConnectedHomePage extends StatefulWidget {
   const ConnectedHomePage({super.key});
 
   @override
-  State<ConnectedHomePage> createState() => _DeconnectedHomePageState();
+  State<ConnectedHomePage> createState() => _ConnectedHomePage();
 }
 
-class _DeconnectedHomePageState extends State<ConnectedHomePage> {
+class _ConnectedHomePage extends State<ConnectedHomePage> {
 
   int _selectedIndex=0;
 

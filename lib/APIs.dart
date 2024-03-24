@@ -599,4 +599,142 @@ class APIs {
     // Return an empty map in case of an error
     return [];
   }
+
+  //get all annonces by student
+  static Future<List<dynamic>> GetAllAnnoncesForStudent(BuildContext context) async {
+    try {
+      final SharedPreferences preferences = await SharedPreferences.getInstance();
+
+      List<dynamic> annoncesData = [];
+
+      final response = await http.get(
+        Uri.parse('${API_URL}/api/annonce/All/Student/${preferences.getString("id").toString()}'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${preferences.getString("token").toString()}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        annoncesData = data;
+        return annoncesData;
+      } else {
+        print('Error receiving student annonce data: ${response.body}');
+      }
+    } catch (error) {
+      print('Error receiving student annonce data: $error');
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: 'vérifier votre internet',
+        ),
+      );
+    }
+    // Return an empty map in case of an error
+    return [];
+  }
+  //get all annonces by groupe
+  static Future<List<dynamic>> GetAllAnnoncesForGroupe(BuildContext context) async {
+    try {
+      final SharedPreferences preferences = await SharedPreferences.getInstance();
+
+      List<dynamic> annoncesData = [];
+
+      final response = await http.get(
+        Uri.parse('${API_URL}/api/annonce/All/Groupe/${preferences.getString("id").toString()}'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${preferences.getString("token").toString()}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        annoncesData = data;
+        return annoncesData;
+      } else {
+        print('Error receiving groupe annonces data: ${response.body}');
+      }
+    } catch (error) {
+      print('Error receiving groupe annonces data: $error');
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: 'vérifier votre internet',
+        ),
+      );
+    }
+    // Return an empty map in case of an error
+    return [];
+  }
+  //get all annonces by section
+  static Future<List<dynamic>> GetAllAnnoncesForSection(BuildContext context) async {
+    try {
+      final SharedPreferences preferences = await SharedPreferences.getInstance();
+
+      List<dynamic> annoncesData = [];
+
+      final response = await http.get(
+        Uri.parse('${API_URL}/api/annonce/All/Section/${preferences.getString("id").toString()}'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${preferences.getString("token").toString()}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        annoncesData = data;
+        return annoncesData;
+      } else {
+        print('Error receiving section annonces data: ${response.body}');
+      }
+    } catch (error) {
+      print('Error receiving section annonces data: $error');
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: 'vérifier votre internet',
+        ),
+      );
+    }
+    // Return an empty map in case of an error
+    return [];
+  }
+  //get all annonces by filiere
+  static Future<List<dynamic>> GetAllAnnoncesForFiliere(BuildContext context) async {
+    try {
+      final SharedPreferences preferences = await SharedPreferences.getInstance();
+
+      List<dynamic> annoncesData = [];
+
+      final response = await http.get(
+        Uri.parse('${API_URL}/api/annonce/All/Filiere/${preferences.getString("id").toString()}'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${preferences.getString("token").toString()}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        annoncesData = data;
+        return annoncesData;
+      } else {
+        print('Error receiving filiere annonces data: ${response.body}');
+      }
+    } catch (error) {
+      print('Error receiving filiere annonces data: $error');
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: 'vérifier votre internet',
+        ),
+      );
+    }
+    // Return an empty map in case of an error
+    return [];
+  }
+
 }
