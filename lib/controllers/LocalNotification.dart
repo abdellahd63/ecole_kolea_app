@@ -1,14 +1,14 @@
 import 'dart:convert';
-import 'package:ecole_kolea_app/Pages/Chat.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 
 class LocalNotification {
   static final FlutterLocalNotificationsPlugin
     _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   //init the local notification
   static Future init() async{
+    final service = FlutterBackgroundService();
     // initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
     const AndroidInitializationSettings initializationSettingsAndroid =
     AndroidInitializationSettings('@mipmap/ic_launcher');

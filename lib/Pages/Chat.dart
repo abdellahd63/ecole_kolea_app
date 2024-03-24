@@ -160,7 +160,6 @@ class _ChatState extends State<Chat> {
 
   @override
   void dispose() async{
-    print(mysourceID);
     socket.emit("signout", mysourceID);
     socket.disconnect();
     super.dispose();
@@ -282,62 +281,65 @@ class _ChatState extends State<Chat> {
                 )
               ),
             ) :
-            TextField(
-              autocorrect: true,
-              controller: messagecontroller,
-              onChanged: (val){
-                if(val.length > 0){
-                  setState(() {
-                    sendButton = true;
-                  });
-                }else{
-                  setState(() {
-                    sendButton = false;
-                  });
-                }
-              },
-              decoration: InputDecoration(
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.all(12),
-                  hintText: "Entrez votre message",
-                  suffixIcon: InkWell(
-                    child: sendButton ? Icon(Icons.send, color: MyAppColors.principalcolor,) : Icon(Icons.upload_file, color: MyAppColors.principalcolor,),
-                    onTap: () async {
-                      if (!sendButton) {
-                        file = await imagePicker.pickImage(source: ImageSource.gallery);
-                        if (file == null) {
-                          showTopSnackBar(
-                            Overlay.of(context),
-                            CustomSnackBar.info(
-                              message: "le fichier n'a pas été téléchargé correctement, vous devez le joindre à nouveau",
-                            ),
-                          );
-                          return;
-                        } else {
-                          await sendIMG(File(file!.path));
-                        }
-                      } else {
-                        if (messagecontroller.text.isNotEmpty && sendButton) {
-                          widget.target["type"] == "classe" ?
-                          sendRoomMessage(
-                            messagecontroller.text,
-                            widget.target["id"],
-                            "",
-                          ) :
-                          sendMessage(
-                            messagecontroller.text,
-                            widget.target["id"],
-                            "",
-                          );
-                          messagecontroller.clear();
-                          setState(() {
-                            sendButton = false;
-                          });
-                        }
-                      }
-                    },                  )
-              ),
-            ),
+            SafeArea(
+              child: TextField(
+                  autocorrect: true,
+                  controller: messagecontroller,
+                  onChanged: (val){
+                    if(val.length > 0){
+                      setState(() {
+                        sendButton = true;
+                      });
+                    }else{
+                      setState(() {
+                        sendButton = false;
+                      });
+                    }
+                  },
+                  decoration: InputDecoration(
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.all(12),
+                      hintText: "Entrez votre message",
+                      suffixIcon: InkWell(
+                        child: sendButton ? Icon(Icons.send, color: MyAppColors.principalcolor,) : Icon(Icons.upload_file, color: MyAppColors.principalcolor,),
+                        onTap: () async {
+                          if (!sendButton) {
+                            file = await imagePicker.pickImage(source: ImageSource.gallery);
+                            if (file == null) {
+                              showTopSnackBar(
+                                Overlay.of(context),
+                                CustomSnackBar.info(
+                                  message: "le fichier n'a pas été téléchargé correctement, vous devez le joindre à nouveau",
+                                ),
+                              );
+                              return;
+                            } else {
+                              await sendIMG(File(file!.path));
+                            }
+                          } else {
+                            if (messagecontroller.text.isNotEmpty && sendButton) {
+                              widget.target["type"] == "classe" ?
+                              sendRoomMessage(
+                                messagecontroller.text,
+                                widget.target["id"],
+                                "",
+                              ) :
+                              sendMessage(
+                                messagecontroller.text,
+                                widget.target["id"],
+                                "",
+                              );
+                              messagecontroller.clear();
+                              setState(() {
+                                sendButton = false;
+                              });
+                            }
+                          }
+                        },                  )
+                  ),
+                ),
+            )
+
           )
       ]),
     );

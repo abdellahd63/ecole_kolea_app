@@ -1,16 +1,19 @@
 
+import 'dart:convert';
+
+import 'package:ecole_kolea_app/Constant.dart';
 import 'package:ecole_kolea_app/Constantes/Colors.dart';
 import 'package:ecole_kolea_app/Pages/ConnectedHomePage.dart';
 import 'package:ecole_kolea_app/Pages/DeconnectedHomepage.dart';
 import 'package:ecole_kolea_app/controllers/LocalNotification.dart';
 import 'package:ecole_kolea_app/controllers/SocketController.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_background/flutter_background.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();

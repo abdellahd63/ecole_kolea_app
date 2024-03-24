@@ -16,7 +16,7 @@ class Doleance extends StatefulWidget {
   State<Doleance> createState() => _DoleanceState();
 }
 
-class _DoleanceState extends State<Doleance> {
+class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
   TextEditingController textEditingController = TextEditingController();
 
   String mysourceID = "";
@@ -79,11 +79,82 @@ class _DoleanceState extends State<Doleance> {
     }
 
   }
+
+  late AnimationController ClasseIconController;
+  bool ClasseisChanged = false;
+  void ClasseIconClicked(){
+    setState(() {
+      isClasseSearching = false;
+      ClasseisChanged = !ClasseisChanged;
+      ClasseisChanged ? ClasseIconController.forward() : ClasseIconController.reverse();
+    });
+  }
+
+  late AnimationController UserIconController;
+  bool UserisChanged = false;
+  void UserIconClicked(){
+    setState(() {
+      isUserSearching = false;
+      UserisChanged = !UserisChanged;
+      UserisChanged ? UserIconController.forward() : UserIconController.reverse();
+    });
+  }
+
+
+  late AnimationController ClasseSearchingIconController;
+  bool isClasseSearching = false;
+  TextEditingController ClasseSearchingtextEditingController = TextEditingController();
+  void ClasseSearching(){
+    setState(() {
+      isClasseSearching = !isClasseSearching;
+      isClasseSearching ? ClasseSearchingIconController.forward() : ClasseSearchingIconController.reverse();
+    });
+  }
+
+  late AnimationController UserSearchingIconController;
+  bool isUserSearching = false;
+  TextEditingController UserSearchingtextEditingController = TextEditingController();
+  void UserSearching(){
+    setState(() {
+      isUserSearching = !isUserSearching;
+      isUserSearching ? UserSearchingIconController.forward() : UserSearchingIconController.reverse();
+    });
+  }
+
+  late AnimationController SearchingIconController;
+  bool isSearching = false;
+  TextEditingController SearchingtextEditingController = TextEditingController();
+  void Searching(){
+    setState(() {
+      isSearching = !isSearching;
+      isSearching ? SearchingIconController.forward() : SearchingIconController.reverse();
+    });
+  }
   @override
   void initState(){
     fetchCurrentUserData();
+    ClasseIconController = AnimationController(
+        vsync: this,
+        duration: Duration(milliseconds: 500)
+    );
+    UserIconController = AnimationController(
+        vsync: this,
+        duration: Duration(milliseconds: 500)
+    );
+    ClasseSearchingIconController = AnimationController(
+        vsync: this,
+        duration: Duration(milliseconds: 500)
+    );
+    UserSearchingIconController = AnimationController(
+        vsync: this,
+        duration: Duration(milliseconds: 500)
+    );
+    SearchingIconController = AnimationController(
+        vsync: this,
+        duration: Duration(milliseconds: 500)
+    );
+    super.initState();
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -420,14 +491,14 @@ class _DoleanceState extends State<Doleance> {
                                     Expanded(
                                       child: InkWell(
                                         child: Container(
-                                          margin: EdgeInsets.only(right: 10),
-                                          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                                           decoration: BoxDecoration(
                                               border: Border.all(
                                                 color: MyAppColors.principalcolor, width: 1.7,
                                               ),
                                               borderRadius: BorderRadius.circular(10)
                                           ),
+                                          margin: EdgeInsets.only(right: 10),
+                                          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                                           child: Center(
                                             child: Text(
                                               'Annuler',
@@ -538,16 +609,75 @@ class _DoleanceState extends State<Doleance> {
             padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
             child: Align(
               alignment: Alignment.centerLeft,
-              child: Text(
-                'Classes',
-                style: TextStyle(
-                    color: MyAppColors.gray400,
-                    fontSize: 12
-                ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Classes',
+                        style: TextStyle(
+                            color: MyAppColors.gray400,
+                            fontSize: 12
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          if(ClasseisChanged) IconButton(
+                              iconSize: 20,
+                              onPressed: ClasseSearching,
+                              icon: AnimatedIcon(
+                                icon: AnimatedIcons.search_ellipsis,
+                                color: MyAppColors.principalcolor,
+                                progress: ClasseSearchingIconController,
+                              )
+                          ),
+                          IconButton(
+                              iconSize: 20,
+                              onPressed: ClasseIconClicked,
+                              icon: AnimatedIcon(
+                                icon: AnimatedIcons.menu_close,
+                                color: MyAppColors.principalcolor,
+                                progress: ClasseIconController,
+                              )
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  AnimatedCrossFade(
+                    firstChild: const Text('',
+                      style: TextStyle(
+                        fontSize: 0
+                      ),
+                    ),
+                    secondChild: Container(
+                      width: MediaQuery.of(context).size.width/1.2,
+                      height: 45,
+                      padding: EdgeInsets.only(top: 4, bottom: 4),
+                      child: SearchBar(
+                          hintText: 'Search for a classe chat',
+                          hintStyle: MaterialStateProperty.resolveWith((states) => TextStyle(fontSize: 12)),
+                          textStyle: MaterialStateProperty.resolveWith((states) => TextStyle(
+                              fontSize: 12,
+                              color: MyAppColors.principalcolor,
+                          )),
+                          controller: ClasseSearchingtextEditingController,
+                          shadowColor: MaterialStateProperty.resolveWith((states) => Colors.transparent),
+                      ),
+                    ),
+                    crossFadeState: isClasseSearching
+                        ? CrossFadeState.showSecond
+                        : CrossFadeState.showFirst,
+                    duration: const Duration(milliseconds: 200),
+                  )
+                ],
               ),
             ),
           ),
-          if (mysourceType != 'user') Expanded(
+          if (mysourceType != 'user' && ClasseisChanged) Expanded(
             child: FutureBuilder<List<dynamic>>(
               future: APIs.GetClasseChatByIDEnseignant(context),
               builder: (context, snapshot) {
@@ -586,16 +716,75 @@ class _DoleanceState extends State<Doleance> {
             padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
             child: Align(
               alignment: Alignment.centerLeft,
-              child: Text(
-                'Users',
-                style: TextStyle(
-                    color: MyAppColors.gray400,
-                    fontSize: 12
-                ),
-              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Users',
+                        style: TextStyle(
+                            color: MyAppColors.gray400,
+                            fontSize: 12
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          if(UserisChanged)IconButton(
+                              iconSize: 20,
+                              onPressed: UserSearching,
+                              icon: AnimatedIcon(
+                                icon: AnimatedIcons.search_ellipsis,
+                                color: MyAppColors.principalcolor,
+                                progress: UserSearchingIconController,
+                              )
+                          ),
+                          IconButton(
+                              iconSize: 20,
+                              onPressed: UserIconClicked,
+                              icon: AnimatedIcon(
+                                icon: AnimatedIcons.menu_close,
+                                color: MyAppColors.principalcolor,
+                                progress: UserIconController,
+                              )
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                  AnimatedCrossFade(
+                    firstChild: const Text('',
+                      style: TextStyle(
+                          fontSize: 0
+                      ),
+                    ),                    secondChild: Container(
+                      width: MediaQuery.of(context).size.width/1.2,
+                      height: 45,
+                      padding: EdgeInsets.only(top: 4, bottom: 4),
+                      child: SearchBar(
+                        hintText: 'Search for a user chat',
+                        hintStyle: MaterialStateProperty.resolveWith((states) => TextStyle(fontSize: 12)),
+                        textStyle: MaterialStateProperty.resolveWith((states) => TextStyle(
+                            fontSize: 12,
+                            color: MyAppColors.principalcolor
+                        )),
+                        controller: UserSearchingtextEditingController,
+                        shadowColor: MaterialStateProperty.resolveWith((states) => Colors.transparent),
+                      ),
+                    ),
+                    crossFadeState: isUserSearching
+                        ? CrossFadeState.showSecond
+                        : CrossFadeState.showFirst,
+                    duration: const Duration(milliseconds: 200),
+                  )
+                ],
+              )
+
             ),
           ),
-          if (mysourceType == 'etudiant') Expanded(
+          if (mysourceType == 'etudiant' && UserisChanged) Expanded(
             child: FutureBuilder<List<dynamic>>(
               future: APIs.GetAllUsers(context),
               builder: (context, snapshot) {
@@ -633,14 +822,61 @@ class _DoleanceState extends State<Doleance> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
             child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Indeviduals',
-                style: TextStyle(
-                    color: MyAppColors.gray400,
-                    fontSize: 12
+                alignment: Alignment.centerLeft,
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(top: 10.0),
+                            child: Text(
+                              mysourceType == 'etudiant' ? 'Enseignants': 'Etudiants',
+                              style: TextStyle(
+                                  color: MyAppColors.gray400,
+                                  fontSize: 12
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                              iconSize: 20,
+                              onPressed: Searching,
+                              icon: AnimatedIcon(
+                                icon: AnimatedIcons.search_ellipsis,
+                                color: MyAppColors.principalcolor,
+                                progress: SearchingIconController,
+                              )
+                          ),
+                        ],
+                      ),
+                      AnimatedCrossFade(
+                        firstChild: const Text('',
+                          style: TextStyle(
+                              fontSize: 0
+                          ),
+                        ),                        secondChild: Container(
+                          width: MediaQuery.of(context).size.width/1.2,
+                          height: 45,
+                          padding: EdgeInsets.only(top: 4, bottom: 4),
+                          child: SearchBar(
+                            hintText: 'Search for your ${mysourceType == 'etudiant' ? 'enseignant': 'etudiant'}',
+                            hintStyle: MaterialStateProperty.resolveWith((states) => TextStyle(fontSize: 12)),
+                            textStyle: MaterialStateProperty.resolveWith((states) => TextStyle(
+                                fontSize: 12,
+                                color: MyAppColors.principalcolor
+                            )),
+                            controller: SearchingtextEditingController,
+                            shadowColor: MaterialStateProperty.resolveWith((states) => Colors.transparent),
+                          ),
+                        ),
+                        crossFadeState: isSearching
+                            ? CrossFadeState.showSecond
+                            : CrossFadeState.showFirst,
+                        duration: const Duration(milliseconds: 200),
+                      )
+                    ]
                 ),
-              ),
             ),
           ),
           Expanded(
