@@ -28,8 +28,12 @@ class SocketController extends GetxController {
       'force new connection': true,
     });
     socket.connect();
-    socket.emit("signin", preferences.getString("id").toString());
+    socket.emit("signin",
+        preferences.getString("id").toString()
+        + preferences.getString("type").toString()
+    );
     socket.on('notification', (data) {
+      print(data);
       LocalNotification.showNotification(
         title: '${data["source"]}',
         body: '${data["msg"]}',
@@ -40,15 +44,15 @@ class SocketController extends GetxController {
         }),
       );
     });
-    print('yes '+ preferences.getString("id").toString());
   }
   @override
   void onInit() async{
     // Initialize variables or perform other setup operations
     super.onInit();
     WidgetsFlutterBinding.ensureInitialized();
-    FlutterBackgroundService.initialize(Start);
     Start();
+    FlutterBackgroundService.initialize(Start);
+
     bool run = await FlutterBackgroundService().isServiceRunning();
     print('isServiceRunning '+ run.toString());
     FlutterBackgroundService().onDataReceived.listen((event) {
@@ -73,7 +77,10 @@ class SocketController extends GetxController {
     // Clean up resources when the controller is closed
     super.onClose();
     //final SharedPreferences preferences = await SharedPreferences.getInstance();
-    // socket.emit("subsignout", preferences.getString("id").toString());
+    // socket.emit("subsignout",
+    //        preferences.getString("id").toString()
+    //         + preferences.getString("type").toString()
+    // );
     // print('SocketController disconnect');
     // socket.disconnect();
   }

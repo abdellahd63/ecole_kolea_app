@@ -1,5 +1,7 @@
+import 'package:ecole_kolea_app/APIs.dart';
 import 'package:ecole_kolea_app/Componants/EvaluationList.dart';
 import 'package:ecole_kolea_app/Constantes/Colors.dart';
+import 'package:ecole_kolea_app/Model/Affichage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -11,20 +13,7 @@ class Evaluation extends StatefulWidget {
 }
 
 class _EvaluationState extends State<Evaluation> {
-
-  List<String> Semestre=[
-    "S10",
-    "S9",
-    "S8",
-    "S7",
-    "S6",
-    "S5",
-    "S4",
-    "S3",
-    "S2",
-    "S1",
-  ];
-
+  bool refrech = true;
   int currentTab=0;
 
   void changeTab(int index){
@@ -32,54 +21,80 @@ class _EvaluationState extends State<Evaluation> {
       currentTab=index;
     });
   }
+  late int? affichageID = null;
+  void setAffichageID(int id){
+    setState(() {
+      affichageID= id;
+      refrech = !refrech;
+    });
+  }
 
-  
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-            children: [
-              //Tab Bar
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SizedBox(
-                  height: 45,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: Semestre.length,
-                    
-                    itemBuilder:(context, index) {
-                      return InkWell(
-                        onTap: (){
-                          changeTab(index);
-                        },
-                        child: AnimatedContainer(
-                          duration: Duration(microseconds: 300),
-                          width: 85,
-                          height: 20,
-                          margin: EdgeInsets.symmetric(horizontal: 5,),
-                          
-                          decoration: BoxDecoration(
-                            color: currentTab == index ? MyAppColors.principalcolor: MyAppColors.dimopacityvblue,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Center(
-                            child: Text(Semestre[index], style: TextStyle(color: currentTab == index ? MyAppColors.whitecolor: MyAppColors.principalcolor),),
+    return FutureBuilder<dynamic>(
+          future: APIs.GetAllAffichageByIDEtudiant(context),
+            builder: (context, AsyncSnapshot<dynamic> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              } else if (!snapshot.hasData || snapshot.data == null) {
+                return Center(child: Text('No data available.'));
+              } else {
+                List<Affichage> AffichageData = List<Affichage>.from(snapshot.data!.map<Affichage>((item) => Affichage.fromJson(item)));
+                if(affichageID == null)
+                affichageID = AffichageData[0].id;
+                return Scaffold(
+                  body: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        //Tab Bar
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: SizedBox(
+                            height: 45,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: AffichageData.length,
+                              itemBuilder:(context, index) {
+                                return InkWell(
+                                  onTap: (){
+                                    changeTab(index);
+                                    setAffichageID(AffichageData[index].id);
+                                  },
+                                  child: AnimatedContainer(
+                                    duration: Duration(microseconds: 300),
+                                    width: 85,
+                                    height: 20,
+                                    margin: EdgeInsets.symmetric(horizontal: 5,),
+
+                                    decoration: BoxDecoration(
+                                      color: currentTab == index ? MyAppColors.principalcolor: MyAppColors.dimopacityvblue,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Center(
+                                      child: Text('S${AffichageData[index].semestre}', style: TextStyle(color: currentTab == index ? MyAppColors.whitecolor: MyAppColors.principalcolor),),
+                                    ),
+                                  ),
+                                );
+                              },
+
+                            ),
                           ),
                         ),
-                      );
-                    },
-                  
+
+                        //Moyenne
+                        if(affichageID != null)
+                          EvaluationList(
+                            key: ValueKey<String>(affichageID.toString()),
+                            id: affichageID.toString(),
+                          ),
+                      ],
+                    ),
                   ),
-                ),
-              ),
-              
-              //Moyenne
-              EvaluationList(),
-            ],
-          ),
-      ),
-      );
+                );
+              }
+            },
+    );
   }
 }

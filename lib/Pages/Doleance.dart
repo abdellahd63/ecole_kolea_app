@@ -21,6 +21,7 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
 
   String mysourceID = "";
   String mysourceType = "";
+  bool loading = true;
 
   String? selectedFiliere;
   String? selectedSection;
@@ -56,12 +57,12 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
     if(mysourceType == 'enseignant'){
       final F_S_G_ByIDEnseignantData = await APIs.GetF_S_G_ByIDEnseignant(context);
       final StudentsByGroupData = await APIs.GetStudentsByGroup(context, F_S_G_ByIDEnseignantData["groupes"]);
-      final UsersData = await APIs.GetAllUsers(context);
       setState(() {
         Filiereitems = F_S_G_ByIDEnseignantData["filieres"] ?? [];
         Sectionitems = F_S_G_ByIDEnseignantData["sections"] ?? [];
         Groupeitems = F_S_G_ByIDEnseignantData["groupes"] ?? [];
         users = StudentsByGroupData.map<User>((item) => User.fromJson(item, 'etudiant')).toList();
+        loading = false;
       });
     }
     if(mysourceType == 'etudiant'){
@@ -69,12 +70,14 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
       final TeachersByGroupData = await APIs.GetTeachersByGroup(context, StudentData['groupe'].toString());
       setState(() {
         users = TeachersByGroupData.map<User>((item) => User.fromJson(item, 'enseignant')).toList();
+        loading = false;
       });
     }
     if(mysourceType == 'user'){
       final AllStudentsData = await APIs.GetAllStudents(context);
       setState(() {
         users = AllStudentsData.map<User>((item) => User.fromJson(item, 'etudiant')).toList();
+        loading = false;
       });
     }
 
@@ -100,7 +103,6 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
     });
   }
 
-
   late AnimationController ClasseSearchingIconController;
   bool isClasseSearching = false;
   TextEditingController ClasseSearchingtextEditingController = TextEditingController();
@@ -124,12 +126,16 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
   late AnimationController SearchingIconController;
   bool isSearching = false;
   TextEditingController SearchingtextEditingController = TextEditingController();
+  List<User> filteredList = [];
   void Searching(){
     setState(() {
       isSearching = !isSearching;
       isSearching ? SearchingIconController.forward() : SearchingIconController.reverse();
+      filteredList = [];
+      SearchingtextEditingController.text = '';
     });
   }
+
   @override
   void initState(){
     fetchCurrentUserData();
@@ -153,6 +159,7 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
         vsync: this,
         duration: Duration(milliseconds: 500)
     );
+
     super.initState();
   }
   @override
@@ -690,11 +697,22 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
                             CircularProgressIndicator(),
                           ],
                         ),)
-                  ); // or any loading indicator
+                  );
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Text('Aucun classe chat disponible.');
+                } else if (!snapshot.hasData) {
+                  return Center(
+                    child: Opacity(
+                      opacity: 0.2,
+                      child: Image.asset(
+                          'lib/Assets/Images/noInternet.png',
+                          width: 50,
+                          height: 50,
+                      ),
+                    ),
+                  );
+                } else if(snapshot.data!.isEmpty){
+                  return Text('Aucune classe disponible.');
                 } else {
                   List<ClasseChat> ClasseChatData = List<ClasseChat>.from(snapshot.data!.map<ClasseChat>((item) => ClasseChat.fromJson(item)));
                   return ListView.builder(
@@ -800,8 +818,19 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
                   ); // or any loading indicator
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Text('Aucun user disponible.');
+                } else if (!snapshot.hasData) {
+                  return Center(
+                    child: Opacity(
+                      opacity: 0.2,
+                      child: Image.asset(
+                        'lib/Assets/Images/noInternet.png',
+                        width: 50,
+                        height: 50,
+                      ),
+                    ),
+                  );
+                } else if(snapshot.data!.isEmpty){
+                  return Text('Aucune classe disponible.');
                 } else {
                   List<UserAdmin> ClasseChatData = List<UserAdmin>.from(snapshot.data!.map<UserAdmin>((item) => UserAdmin.fromJson(item, 'user')));
                   return ListView.builder(
@@ -867,6 +896,21 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
                                 color: MyAppColors.principalcolor
                             )),
                             controller: SearchingtextEditingController,
+                            onChanged: (value){
+                              if (isSearching && SearchingtextEditingController.text.isEmpty) {
+                                setState(() {
+                                  filteredList = List<User>.from(users);
+                                });
+                              }
+                              if (isSearching && SearchingtextEditingController.text.isNotEmpty) {
+                                setState(() {
+                                  filteredList = users.where((user) {
+                                    return user.nom.toLowerCase().contains(SearchingtextEditingController.text.toLowerCase())
+                                        || user.prenom.toLowerCase().contains(SearchingtextEditingController.text.toLowerCase());
+                                  }).toList();
+                                });
+                              }
+                            },
                             shadowColor: MaterialStateProperty.resolveWith((states) => Colors.transparent),
                           ),
                         ),
@@ -879,15 +923,34 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
                 ),
             ),
           ),
+          if(loading)
+            Container(
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircularProgressIndicator(),
+                    ],
+                  ),
+                )
+            ),
           Expanded(
             child: ListView.builder(
-              itemCount: users.length,
+              itemCount: isSearching && SearchingtextEditingController.text.isNotEmpty
+                  ? filteredList.length
+                  : users.length,
               itemBuilder: (context, index) {
                 return MessageCard(
                   imgpath: 'lib/Assets/Images/noprofilpic.png',
-                  title: users[index].nom +" "+ users[index].prenom,
-                  type: users[index].type,
-                  TargetID: users[index].id.toString(),
+                  title: isSearching && SearchingtextEditingController.text.isNotEmpty
+                      ? filteredList[index].nom +" "+ filteredList[index].prenom
+                      : users[index].nom +" "+ users[index].prenom, // Use filteredUsers if searching
+                  type: isSearching && SearchingtextEditingController.text.isNotEmpty
+                      ? filteredList[index].type
+                      : users[index].type, // Use filteredUsers if searching
+                  TargetID: isSearching && SearchingtextEditingController.text.isNotEmpty
+                      ? filteredList[index].id.toString()
+                      : users[index].id.toString(), // Use filteredUsers if searching
                 );
               },
             ),

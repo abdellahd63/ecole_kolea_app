@@ -737,4 +737,74 @@ class APIs {
     return [];
   }
 
+  //Evaluation
+  //get all affichage by Etusiant
+  static Future<List<dynamic>> GetAllAffichageByIDEtudiant(BuildContext context) async {
+    try {
+      final SharedPreferences preferences = await SharedPreferences.getInstance();
+
+      List<dynamic> affichagesData = [];
+
+      final response = await http.get(
+        Uri.parse('${API_URL}/api/evaluation/affichage/${preferences.getString("id").toString()}'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${preferences.getString("token").toString()}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        affichagesData = data;
+        return affichagesData;
+      } else {
+        print('Error receiving affichages data: ${response.body}');
+      }
+    } catch (error) {
+      print('Error receiving affichages data: $error');
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: 'vérifier votre internet',
+        ),
+      );
+    }
+    // Return an empty map in case of an error
+    return [];
+  }
+  //get all NoteModule by Affichage
+  static Future<List<dynamic>> GetAllNoteModuleByIDAffichage(BuildContext context, String id) async {
+    try {
+      final SharedPreferences preferences = await SharedPreferences.getInstance();
+
+      List<dynamic> notemoduleData = [];
+
+      final response = await http.get(
+        Uri.parse('${API_URL}/api/evaluation/notemodule/${id}'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${preferences.getString("token").toString()}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        notemoduleData = data;
+        return notemoduleData;
+      } else {
+        print('Error receiving note module data: ${response.body}');
+      }
+    } catch (error) {
+      print('Error receiving note module data: $error');
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: 'vérifier votre internet',
+        ),
+      );
+    }
+    // Return an empty map in case of an error
+    return [];
+  }
+
 }
