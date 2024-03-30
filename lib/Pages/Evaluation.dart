@@ -13,7 +13,6 @@ class Evaluation extends StatefulWidget {
 }
 
 class _EvaluationState extends State<Evaluation> {
-  bool refrech = true;
   int currentTab=0;
 
   void changeTab(int index){
@@ -25,7 +24,6 @@ class _EvaluationState extends State<Evaluation> {
   void setAffichageID(int id){
     setState(() {
       affichageID= id;
-      refrech = !refrech;
     });
   }
 
@@ -42,6 +40,8 @@ class _EvaluationState extends State<Evaluation> {
                 return Center(child: Text('No data available.'));
               } else {
                 List<Affichage> AffichageData = List<Affichage>.from(snapshot.data!.map<Affichage>((item) => Affichage.fromJson(item)));
+                if (AffichageData.isEmpty)
+                  return Center(child: Text('No data available.'));
                 if(affichageID == null)
                 affichageID = AffichageData[0].id;
                 return Scaffold(
