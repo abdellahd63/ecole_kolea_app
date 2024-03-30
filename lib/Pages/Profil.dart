@@ -186,7 +186,8 @@ class Profil extends StatelessWidget {
                                               ),
                                             ),
 
-                                            Text('Master 1er annee',
+                                            Text(
+                                              '${userData["cycle"].toString()} année',
                                               style: TextStyle(
                                                   color: MyAppColors.principalcolor,
 
@@ -218,7 +219,7 @@ class Profil extends StatelessWidget {
                                                   fontSize: 14
                                               ),
                                             ),
-                                            Text('E-Banking',
+                                            Text('${userData["filiereName"].toString()}',
                                               style: TextStyle(
                                                   color: MyAppColors.principalcolor,
                                                   fontSize: 14
@@ -253,7 +254,7 @@ class Profil extends StatelessWidget {
                                                     ),
                                                   ),
 
-                                                  Text('A',
+                                                  Text('${userData["sectionName"].toString()}',
                                                     style: TextStyle(
                                                         color: MyAppColors.principalcolor,
 
