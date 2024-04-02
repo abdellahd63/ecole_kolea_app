@@ -146,6 +146,7 @@ class PlanningCours extends StatelessWidget {
               endHour: 18,
               
               
+
               // each header is a column and a day
               headers: [
                 TimePlannerTitle(

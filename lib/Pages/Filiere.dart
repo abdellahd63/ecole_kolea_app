@@ -8,9 +8,9 @@ class Filiere extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: MyAppColors.whitecolor,
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: SingleChildScrollView(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
               //discover
@@ -102,80 +102,109 @@ class Filiere extends StatelessWidget {
 
               //Specialite
 
-              Padding(
-                padding: const EdgeInsets.only(left : 30.0),
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                decoration: BoxDecoration(
+                  color: MyAppColors.dimopacityvblue,
+                  borderRadius: BorderRadius.circular(15)
+                ),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-              
-                    Icon(Icons.circle, color: Colors.black, size: 16,),
-                    SizedBox(width: 20,),
+                
                     Text("E-Banking",
                       textAlign: TextAlign.justify,
-                      style: TextStyle(color: Colors.black, fontSize: 15,),
+                      style: TextStyle(color: Colors.black, fontSize: 15,fontWeight: FontWeight.w700),
                     ),
                   ],
                 ),
               ),
 
-              Padding(
-                padding: const EdgeInsets.only(left : 30.0),
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                decoration: BoxDecoration(
+                  color: MyAppColors.dimopacityvblue,
+                  borderRadius: BorderRadius.circular(15)
+                ),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-              
-                    Icon(Icons.circle, color: Colors.black, size: 16,),
-                    SizedBox(width: 20,),
+                
                     Text("E-Business",
                       textAlign: TextAlign.justify,
-                      style: TextStyle(color: Colors.black, fontSize: 15,),
+                      style: TextStyle(color: Colors.black, fontSize: 15,fontWeight: FontWeight.w700),
                     ),
                   ],
                 ),
               ),
 
-              Padding(
-                padding: const EdgeInsets.only(left : 30.0),
+
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                decoration: BoxDecoration(
+                  color: MyAppColors.dimopacityvblue,
+                  borderRadius: BorderRadius.circular(15)
+                ),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-              
-                    Icon(Icons.circle, color: Colors.black, size: 16,),
-                    SizedBox(width: 20,),
+                
                     Text("Audit et contrôle de gestion",
                       textAlign: TextAlign.justify,
-                      style: TextStyle(color: Colors.black, fontSize: 15,),
+                      style: TextStyle(color: Colors.black, fontSize: 15,fontWeight: FontWeight.w700),
                     ),
                   ],
                 ),
               ),
 
-              Padding(
-                padding: const EdgeInsets.only(left : 30.0),
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                decoration: BoxDecoration(
+                  color: MyAppColors.dimopacityvblue,
+                  borderRadius: BorderRadius.circular(15)
+                ),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-              
-                    Icon(Icons.circle, color: Colors.black, size: 16,),
-                    SizedBox(width: 20,),
+                
                     Text("Gouvernance de la sécurité des SI",
                       textAlign: TextAlign.justify,
-                      style: TextStyle(color: Colors.black, fontSize: 15,),
+                      style: TextStyle(color: Colors.black, fontSize: 15,fontWeight: FontWeight.w700),
                     ),
                   ],
                 ),
               ),
 
-              Padding(
-                padding: const EdgeInsets.only(left : 30.0),
-                child: Row(
-                  children: [
+             
+
               
-                    Icon(Icons.circle, color: Colors.black, size: 16,),
-                    SizedBox(width: 20,),
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                decoration: BoxDecoration(
+                  color: MyAppColors.dimopacityvblue,
+                  borderRadius: BorderRadius.circular(15)
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                
                     Text("Management Digital",
                       textAlign: TextAlign.justify,
-                      style: TextStyle(color: Colors.black, fontSize: 15,),
+                      style: TextStyle(color: Colors.black, fontSize: 15,fontWeight: FontWeight.w700),
                     ),
                   ],
                 ),
               ),
+
+
+              
+
+            
             ],
           ),
         ),
