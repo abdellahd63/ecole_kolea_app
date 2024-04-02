@@ -3,6 +3,7 @@ import 'package:ecole_kolea_app/Constantes/Colors.dart';
 import 'package:ecole_kolea_app/Pages/ConnectedHomePage.dart';
 import 'package:ecole_kolea_app/Pages/DeconnectedHomepage.dart';
 import 'package:ecole_kolea_app/controllers/LocalNotification.dart';
+import 'package:ecole_kolea_app/controllers/Searching.dart';
 import 'package:ecole_kolea_app/controllers/SocketController.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

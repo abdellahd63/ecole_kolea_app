@@ -2,7 +2,9 @@ import 'package:ecole_kolea_app/APIs.dart';
 import 'package:ecole_kolea_app/Constantes/Colors.dart';
 import 'package:ecole_kolea_app/Model/CategorieModel.dart';
 import 'package:ecole_kolea_app/Model/Document.dart';
+import 'package:ecole_kolea_app/controllers/Searching.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class Livres extends StatelessWidget {
   Livres({super.key, required this.Categorie, required this.name});
@@ -10,6 +12,7 @@ class Livres extends StatelessWidget {
   final String name;
   @override
   Widget build(BuildContext context) {
+    final searching = Get.put(Searching());
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -31,7 +34,6 @@ class Livres extends StatelessWidget {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              SizedBox(height: 20,),
               FutureBuilder<List<dynamic>>(
                 future: APIs.GetAllDocumentsByIDCategorie(context, Categorie),
                 builder: (context, snapshot) {
@@ -51,39 +53,71 @@ class Livres extends StatelessWidget {
                     return Text('Aucun document disponible.');
                   } else {
                     List<Document> documentData = List<Document>.from(snapshot.data!.map<Document>((item) => Document.fromJson(item)));
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: documentData.length,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ListTile(
-                            tileColor: MyAppColors.dimopacityvblue,
-                            title: Text('${documentData[index].nom_document}'),
-                            subtitle: Row(
-                              children: [
-                                Text(
-                                  documentData[index].disponibilite != 0
-                                      ? "disponible : "
-                                      : "indisponible",
-                                  style: TextStyle(
-                                    color: documentData[index].disponibilite != 0
-                                        ? Colors.green
-                                        : Colors.red
-                                  ),
-                                ),
-                                if(documentData[index].disponibilite > 0)
-                                Text('${documentData[index].disponibilite}',
-                                  style: TextStyle(
-                                      color: Colors.green
-                                  ),
-                                ),
-                              ],
-                            ),
-                            trailing: Icon(Icons.download),
+                    if(searching.DocumentSearchingtextController.text.isEmpty) {
+                      searching.DocumentFilteredList.value =
+                      List<Document>.from(documentData);
+                    }
+                    return Column(
+                      children: [
+                        Container(
+                          margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          child: SearchBar(
+                            hintText: 'Search for your a document',
+                            hintStyle: MaterialStateProperty.resolveWith((states) => TextStyle(fontSize: 12)),
+                            textStyle: MaterialStateProperty.resolveWith((states) => TextStyle(
+                                fontSize: 12,
+                                color: MyAppColors.principalcolor
+                            )),
+                            controller: searching.DocumentSearchingtextController,
+                            onChanged: (value){
+                              if (searching.DocumentSearchingtextController.text.isEmpty) {
+                                searching.DocumentSearchingtextController.clear();
+                                searching.DocumentFilteredList.value = List<Document>.from(documentData);
+                              }
+                              if (searching.DocumentSearchingtextController.text.isNotEmpty) {
+                                searching.DocumentFilteredList.value = documentData.where((document) {
+                                  return document.nom_document.toLowerCase().contains(searching.DocumentSearchingtextController.text.toLowerCase());
+                                }).toList();
+                              }
+                            },
+                            shadowColor: MaterialStateProperty.resolveWith((states) => Colors.transparent),
                           ),
-                        );
-                      },
+                        ),
+                        Obx(() =>ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: searching.DocumentFilteredList.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: ListTile(
+                                tileColor: MyAppColors.dimopacityvblue,
+                                title: Text('${searching.DocumentFilteredList[index].nom_document}'),
+                                subtitle: Row(
+                                  children: [
+                                    Text(
+                                      searching.DocumentFilteredList[index].disponibilite != 0
+                                          ? "disponible : "
+                                          : "indisponible",
+                                      style: TextStyle(
+                                        color: searching.DocumentFilteredList[index].disponibilite != 0
+                                            ? Colors.green
+                                            : Colors.red
+                                      ),
+                                    ),
+                                    if(searching.DocumentFilteredList[index].disponibilite > 0)
+                                    Text('${searching.DocumentFilteredList[index].disponibilite}',
+                                      style: TextStyle(
+                                          color: Colors.green
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                trailing: Icon(Icons.download),
+                              ),
+                            );
+                          },
+                        )),
+                      ],
                     );
                   }
                 },

@@ -185,12 +185,10 @@ class Profil extends StatelessWidget {
                                                   fontSize: 14
                                               ),
                                             ),
-
                                             Text(
                                               '${userData["cycle"].toString()} année',
                                               style: TextStyle(
                                                   color: MyAppColors.principalcolor,
-
                                                   fontSize: 14
                                               ),
                                             )
