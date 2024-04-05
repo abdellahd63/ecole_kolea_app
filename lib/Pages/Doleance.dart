@@ -777,7 +777,7 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
                     ),
                   );
                 } else if(snapshot.data!.isEmpty){
-                  return Text('Aucune classe disponible.');
+                  return Text('Aucun user disponible.');
                 } else {
                   List<UserAdmin> ClasseChatData = List<UserAdmin>.from(snapshot.data!.map<UserAdmin>((item) => UserAdmin.fromJson(item, 'user')));
                   if(searching.BibliothequeSearchingtextController.text.isEmpty) {
