@@ -3,8 +3,14 @@ import 'package:ecole_kolea_app/APIs.dart';
 import 'package:ecole_kolea_app/Componants/MessageCard.dart';
 import 'package:ecole_kolea_app/Constantes/Colors.dart';
 import 'package:ecole_kolea_app/Model/ClasseChat.dart';
+import 'package:ecole_kolea_app/Model/Filiere.dart';
+import 'package:ecole_kolea_app/Model/Groupe.dart';
+import 'package:ecole_kolea_app/Model/Groupe.dart';
+import 'package:ecole_kolea_app/Model/Section.dart';
+import 'package:ecole_kolea_app/Model/Section.dart';
 import 'package:ecole_kolea_app/Model/User.dart';
 import 'package:ecole_kolea_app/Model/UserAdmin.dart';
+import 'package:ecole_kolea_app/controllers/GroupeChatController.js.dart';
 import 'package:ecole_kolea_app/controllers/Searching.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,18 +26,12 @@ class Doleance extends StatefulWidget {
 class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
   TextEditingController textEditingController = TextEditingController();
   final searching = Get.put(Searching());
+  final GroupeChat = Get.put(GroupeChatController());
 
   String mysourceID = "";
   String mysourceType = "";
   bool loading = true;
 
-  String? selectedFiliere;
-  String? selectedSection;
-  String? selectedGroupe;
-
-  List<dynamic> Filiereitems = [];
-  List<dynamic> Sectionitems = [];
-  List<dynamic> Groupeitems = [];
 
   List<User> users= [];
   List<ClasseChat> classes= [];
@@ -45,9 +45,7 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
         mysourceID
     );
     if(room.length > 0){
-      setState(() {
-        users.add(User(id: 38, nom: "informatique", prenom: "G1", section: "1", type: "classe"));
-      });
+      GroupeChat.ClearAll();
     }
   }
   Future<void> fetchCurrentUserData() async {
@@ -60,9 +58,9 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
       final F_S_G_ByIDEnseignantData = await APIs.GetF_S_G_ByIDEnseignant(context);
       final StudentsByGroupData = await APIs.GetStudentsByGroup(context, F_S_G_ByIDEnseignantData["groupes"]);
       setState(() {
-        Filiereitems = F_S_G_ByIDEnseignantData["filieres"] ?? [];
-        Sectionitems = F_S_G_ByIDEnseignantData["sections"] ?? [];
-        Groupeitems = F_S_G_ByIDEnseignantData["groupes"] ?? [];
+        GroupeChat.Filiereitems.value = F_S_G_ByIDEnseignantData["filieres"].map<Filiere>((item) => Filiere.fromJson(item)).toList();
+        GroupeChat.Sectionitems.value = F_S_G_ByIDEnseignantData["sections"].map<Section>((item) => Section.fromJson(item)).toList();
+        GroupeChat.Groupeitems.value = F_S_G_ByIDEnseignantData["groupes"].map<Groupe>((item) => Groupe.fromJson(item)).toList();
         users = StudentsByGroupData.map<User>((item) => User.fromJson(item, 'etudiant')).toList();
         searching.DoleanceFilteredList.value = List<User>.from(users);
         loading = false;
@@ -137,6 +135,8 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
 
     super.initState();
   }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -156,6 +156,7 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
                   InkWell(
                   onTap: () {
                     showDialog(
+                      barrierDismissible: false,
                       context: context,
                       builder: (context) => AlertDialog(
                         icon:  Container(
@@ -200,79 +201,84 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
                                 ),
                               ),
                               SizedBox(height: 2),
-                              DropdownButtonHideUnderline(
-                                child: DropdownButton2<String>(
-                                  isExpanded: true,
-                                  hint: Text(
-                                    'sélectionner la filiere',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Theme.of(context).hintColor,
-                                    ),
-                                  ),
-                                  items: Filiereitems.map((item) =>
-                                      DropdownMenuItem(
-                                        value: item['id'].toString(),
-                                        child: Text(item['libelle'].toString()),
-                                      )
-                                  ).toList(),
-                                  value: selectedFiliere,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      selectedFiliere = value;
-                                    });
-                                    print(selectedFiliere);
-                                  },
-                                  buttonStyleData: const ButtonStyleData(
-                                    padding: EdgeInsets.symmetric(horizontal: 16),
-                                    height: 40,
-                                    width: 200,
-                                  ),
-                                  dropdownStyleData: const DropdownStyleData(
-                                    maxHeight: 200,
-                                  ),
-                                  menuItemStyleData: const MenuItemStyleData(
-                                    height: 40,
-                                  ),
-                                  dropdownSearchData: DropdownSearchData(
-                                    searchController: textEditingController,
-                                    searchInnerWidgetHeight: 50,
-                                    searchInnerWidget: Container(
-                                      height: 50,
-                                      padding: const EdgeInsets.only(
-                                        top: 8,
-                                        bottom: 4,
-                                        right: 8,
-                                        left: 8,
+                              Obx(() =>
+                                DropdownButtonHideUnderline(
+                                  child: DropdownButton2<String>(
+                                    isExpanded: true,
+                                    hint: Text(
+                                      'sélectionner la filiere',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Theme.of(context).hintColor,
                                       ),
-                                      child: TextFormField(
-                                        expands: true,
-                                        maxLines: null,
-                                        controller: textEditingController,
-                                        decoration: InputDecoration(
-                                          isDense: true,
-                                          contentPadding: const EdgeInsets.symmetric(
-                                            horizontal: 10,
-                                            vertical: 8,
-                                          ),
-                                          hintText: 'Rechercher un élément...',
-                                          hintStyle: const TextStyle(fontSize: 12),
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    items: GroupeChat.Filiereitems.value.map((item) =>
+                                        DropdownMenuItem(
+                                          value: item.id.toString(),
+                                          child: Text(item.libelle.toString()),
+                                        )
+                                    ).toList(),
+                                    value: GroupeChat.FilieretextSelection.value.isEmpty
+                                        ? null
+                                        : GroupeChat.FilieretextSelection.value,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        GroupeChat.FilieretextSelection.value = value!;
+                                        GroupeChat.SectiontextSelection.value = '';
+                                        GroupeChat.GroupetextSelection.value = '';
+                                      });
+                                    },
+                                    buttonStyleData: const ButtonStyleData(
+                                      padding: EdgeInsets.symmetric(horizontal: 16),
+                                      height: 40,
+                                      width: 200,
+                                    ),
+                                    dropdownStyleData: const DropdownStyleData(
+                                      maxHeight: 200,
+                                    ),
+                                    menuItemStyleData: const MenuItemStyleData(
+                                      height: 40,
+                                    ),
+                                    dropdownSearchData: DropdownSearchData(
+                                      searchController: textEditingController,
+                                      searchInnerWidgetHeight: 50,
+                                      searchInnerWidget: Container(
+                                        height: 50,
+                                        padding: const EdgeInsets.only(
+                                          top: 8,
+                                          bottom: 4,
+                                          right: 8,
+                                          left: 8,
+                                        ),
+                                        child: TextFormField(
+                                          expands: true,
+                                          maxLines: null,
+                                          controller: textEditingController,
+                                          decoration: InputDecoration(
+                                            isDense: true,
+                                            contentPadding: const EdgeInsets.symmetric(
+                                              horizontal: 10,
+                                              vertical: 8,
+                                            ),
+                                            hintText: 'Rechercher un élément...',
+                                            hintStyle: const TextStyle(fontSize: 12),
+                                            border: OutlineInputBorder(
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
                                           ),
                                         ),
                                       ),
+                                      searchMatchFn: (item, searchValue) {
+                                        return item.value.toString().contains(searchValue);
+                                      },
                                     ),
-                                    searchMatchFn: (item, searchValue) {
-                                      return item.value.toString().contains(searchValue);
+                                    //This to clear the search value when you close the menu
+                                    onMenuStateChange: (isOpen) {
+                                      if (!isOpen) {
+                                        textEditingController.clear();
+                                      }
                                     },
                                   ),
-                                  //This to clear the search value when you close the menu
-                                  onMenuStateChange: (isOpen) {
-                                    if (!isOpen) {
-                                      textEditingController.clear();
-                                    }
-                                  },
                                 ),
                               ),
                               SizedBox(height: 8),
@@ -284,7 +290,8 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
                                 ),
                               ),
                               SizedBox(height: 2),
-                              DropdownButtonHideUnderline(
+                              Obx(() =>
+                                DropdownButtonHideUnderline(
                                 child: DropdownButton2<String>(
                                   isExpanded: true,
                                   hint: Text(
@@ -294,14 +301,16 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
                                       color: Theme.of(context).hintColor,
                                     ),
                                   ),
-                                  items: Sectionitems.map((item) =>
+                                  items: GroupeChat.Sectionitems.value
+                                      .where((item) => item.filiere.toString() == GroupeChat.FilieretextSelection.value)
+                                      .map((item) =>
                                       DropdownMenuItem(
-                                        value: item['id'].toString(),
+                                        value: item.id.toString(),
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                                'Section '+item['libelle'].toString(),
+                                                'Section '+item.libelle.toString(),
                                                 style: TextStyle(
                                                   fontSize: 14,
                                                 ),
@@ -310,12 +319,14 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
                                         ),
                                       )
                                   ).toList(),
-                                  value: selectedSection,
+                                  value: GroupeChat.SectiontextSelection.value.isEmpty
+                                      ? null
+                                      : GroupeChat.SectiontextSelection.value,
                                   onChanged: (value) {
                                     setState(() {
-                                      selectedSection = value;
+                                      GroupeChat.SectiontextSelection.value = value!;
+                                      GroupeChat.GroupetextSelection.value = '';
                                     });
-                                    print(selectedSection);
                                   },
                                   buttonStyleData: const ButtonStyleData(
                                     padding: EdgeInsets.symmetric(horizontal: 16),
@@ -368,6 +379,7 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
                                     }
                                   },
                                 ),
+                              ),
                               ),
                               SizedBox(height: 8),
                               Text(
@@ -378,7 +390,8 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
                                 ),
                               ),
                               SizedBox(height: 2),
-                              DropdownButtonHideUnderline(
+                              Obx(() =>
+                                DropdownButtonHideUnderline(
                                 child: DropdownButton2<String>(
                                   isExpanded: true,
                                   hint: Text(
@@ -388,14 +401,16 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
                                       color: Theme.of(context).hintColor,
                                     ),
                                   ),
-                                  items: Groupeitems.map((item) =>
+                                  items: GroupeChat.Groupeitems.value
+                                      .where((item) => item.section.toString() == GroupeChat.SectiontextSelection.value)
+                                      .map((item) =>
                                       DropdownMenuItem(
-                                        value: item['id'].toString(),
+                                        value: item.id.toString(),
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              'Groupe '+item['libelle'].toString(),
+                                              'Groupe '+item.libelle.toString(),
                                               style: TextStyle(
                                                 fontSize: 14,
                                               ),
@@ -404,12 +419,13 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
                                         ),
                                       )
                                   ).toList(),
-                                  value: selectedGroupe,
+                                  value: GroupeChat.GroupetextSelection.value.isEmpty
+                                      ? null
+                                      : GroupeChat.GroupetextSelection.value,
                                   onChanged: (value) {
                                     setState(() {
-                                      selectedGroupe = value;
+                                      GroupeChat.GroupetextSelection.value = value!;
                                     });
-                                    print(selectedGroupe);
                                   },
                                   buttonStyleData: const ButtonStyleData(
                                     padding: EdgeInsets.symmetric(horizontal: 16),
@@ -462,6 +478,7 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
                                     }
                                   },
                                 ),
+                              ),
                               ),
                               SizedBox(height: 16),
                               Padding(
@@ -493,6 +510,7 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
                                         ),
                                         onTap: (){
                                           Navigator.of(context).pop();
+                                          GroupeChat.ClearAll();
                                         },
                                       ),
                                     ),
@@ -549,9 +567,9 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
                                             },
                                           );
                                           createNewRoom(
-                                              selectedFiliere,
-                                              selectedSection,
-                                              selectedGroupe
+                                              GroupeChat.FilieretextSelection.value,
+                                              GroupeChat.SectiontextSelection.value,
+                                              GroupeChat.GroupetextSelection.value
                                           );
                                         },
                                       ),
@@ -562,6 +580,7 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
                             ],
                           ),
                         ),
+
                       ),
                     );
                   },

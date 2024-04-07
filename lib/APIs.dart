@@ -4,11 +4,15 @@ import 'package:ecole_kolea_app/Constant.dart';
 import 'package:ecole_kolea_app/Pages/ConnectedHomePage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'dart:core';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
+import 'package:intl/date_symbol_data_local.dart';
+
+
 class APIs {
   static const API_URL = Constant.URL;
   static List<int> extractIds(List<dynamic> data) {
@@ -134,10 +138,9 @@ class APIs {
   //create new chat room
   static Future<Map<String, dynamic>> CreateNewRoom(BuildContext context, FiliereController, SectionController, GroupeController, enseignantID) async {
     try{
-      if(FiliereController != null || FiliereController.isEmpty ||
-          SectionController != null || SectionController.isEmpty ||
-          GroupeController != null || GroupeController.isEmpty ||
-          enseignantID.isEmpty){
+      if(FiliereController.isEmpty ||
+          SectionController.isEmpty ||
+          GroupeController.isEmpty){
         Navigator.of(context).pop();
         showTopSnackBar(
           Overlay.of(context),
@@ -153,7 +156,7 @@ class APIs {
         'Filiere': FiliereController,
         'Section': SectionController,
         'Groupe': GroupeController,
-        'enseignantID': enseignantID
+        'enseignantID': preferences.getString("id").toString()
       };
 
       final response = await http.post(
@@ -805,6 +808,63 @@ class APIs {
     }
     // Return an empty map in case of an error
     return [];
+  }
+
+  //Presence
+  static Future<String> GetCreneau(BuildContext context, String time, String groupe) async {
+    try {
+      if(time.isEmpty ||
+          groupe.isEmpty){
+        Navigator.of(context).pop();
+        showTopSnackBar(
+          Overlay.of(context),
+          CustomSnackBar.info(
+            message: "Tous les champs doivent être remplis",
+          ),
+        );
+        return '';
+      }
+
+      final SharedPreferences preferences = await SharedPreferences.getInstance();
+
+      await initializeDateFormatting('fr_FR', null);
+      String dayName = DateFormat('EEEE', 'fr_FR').format(DateTime.now());
+
+      final response = await http.get(
+        Uri.parse('${API_URL}/api/creneau/${dayName}/${groupe}/${preferences.getString("id").toString()}/${time}'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${preferences.getString("token").toString()}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
+        return data.toString();
+      } else {
+        Navigator.of(context).pop();
+        final data = json.decode(response.body);
+        showTopSnackBar(
+          Overlay.of(context),
+          CustomSnackBar.error(
+            message: data['message'].toString(),
+          ),
+        );
+      }
+    } catch (error) {
+      print('Error receiving creneau data: $error');
+      Navigator.of(context).pop();
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: 'vérifier votre internet',
+        ),
+      );
+    }
+    // Return an empty map in case of an error
+    return '';
   }
 
 }
