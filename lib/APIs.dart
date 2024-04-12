@@ -852,6 +852,7 @@ class APIs {
             message: data['message'].toString(),
           ),
         );
+        return '';
       }
     } catch (error) {
       print('Error receiving creneau data: $error');
@@ -866,5 +867,65 @@ class APIs {
     // Return an empty map in case of an error
     return '';
   }
+  static Future<String> PostPresence(BuildContext context, String creneau) async {
+    try {
+      if(creneau.isEmpty){
+        Navigator.of(context).pop();
+        showTopSnackBar(
+          Overlay.of(context),
+          CustomSnackBar.info(
+            message: "Scannez à nouveau le code QR",
+          ),
+        );
+        return '';
+      }
+
+      final SharedPreferences preferences = await SharedPreferences.getInstance();
+
+      final data = {
+        'creneau': creneau,
+        'date': DateTime.now().toIso8601String(),
+        'etudiant': preferences.getString("id").toString()
+      };
+
+      final response = await http.post(
+        Uri.parse('${API_URL}/api/Presence'),
+        body: jsonEncode(data),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${preferences.getString("token").toString()}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        showTopSnackBar(
+          Overlay.of(context),
+          CustomSnackBar.success(
+            message: data['message'].toString(),
+          ),
+        );
+      } else {
+        final data = json.decode(response.body);
+        showTopSnackBar(
+          Overlay.of(context),
+          CustomSnackBar.error(
+            message: data['message'].toString(),
+          ),
+        );
+      }
+    } catch (error) {
+      print('Error creating presence: $error');
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: 'vérifier votre internet',
+        ),
+      );
+    }
+    // Return an empty map in case of an error
+    return '';
+  }
+
 
 }
