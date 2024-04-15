@@ -11,9 +11,13 @@ import 'package:ecole_kolea_app/Pages/Presence.dart';
 import 'package:ecole_kolea_app/Pages/Presentation.dart';
 import 'package:ecole_kolea_app/Pages/Profil.dart';
 import 'package:ecole_kolea_app/Pages/Programmes.dart';
+import 'package:ecole_kolea_app/controllers/GroupeChatController.js.dart';
+import 'package:ecole_kolea_app/controllers/QRcodeController.dart';
+import 'package:ecole_kolea_app/controllers/Searching.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:get/get.dart';
 
 class ConnectedHomePage extends StatefulWidget {
   const ConnectedHomePage({super.key});
@@ -23,7 +27,6 @@ class ConnectedHomePage extends StatefulWidget {
 }
 
 class _ConnectedHomePage extends State<ConnectedHomePage> {
-
   String mysourceID = "";
   static String mysourceType = "";
   int _selectedIndex=0;
@@ -33,6 +36,16 @@ class _ConnectedHomePage extends State<ConnectedHomePage> {
       mysourceID = preferences.getString("id").toString();
       mysourceType = preferences.getString("type").toString();
     });
+  }
+  void ClearControllers(){
+    final searching = Get.put(Searching());
+    final GroupeChat = Get.put(GroupeChatController());
+    final Qrcode = Get.put(QRcodeController());
+
+    searching.ClearAll();
+    GroupeChat.ClearAllItems();
+    GroupeChat.ClearAll();
+    Qrcode.Clear();
   }
   static  List<Widget> routes= [
     const Presentation(),
@@ -263,6 +276,7 @@ class _ConnectedHomePage extends State<ConnectedHomePage> {
                 if (preferences.getString("id") == null &&
                     preferences.getString("type") == null &&
                     preferences.getString("token") == null) {
+                  ClearControllers();
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => DeconnectedHomePage()),

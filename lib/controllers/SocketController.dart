@@ -1,10 +1,8 @@
 import 'dart:convert';
 
 import 'package:ecole_kolea_app/Constant.dart';
-import 'package:ecole_kolea_app/Pages/Chat.dart';
 import 'package:ecole_kolea_app/controllers/LocalNotification.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/src/widgets/overlay.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';

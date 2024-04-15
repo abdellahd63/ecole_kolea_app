@@ -26,4 +26,18 @@ class Searching extends GetxController {
   TextEditingController DoleanceUserSearchingtextController = TextEditingController();
   var DoleanceUserFilteredList = [].obs;
 
+  void ClearAll(){
+    BibliothequeSearchingtextController.clear();
+    BibliothequeFilteredList.clear();
+    CategorieSearchingtextController.clear();
+    CategorieFilteredList.clear();
+    DocumentSearchingtextController.clear();
+    DocumentFilteredList.clear();
+    DoleanceSearchingtextController.clear();
+    DoleanceFilteredList.clear();
+    DoleanceClasseSearchingtextController.clear();
+    DoleanceClasseFilteredList.clear();
+    DoleanceUserSearchingtextController.clear();
+    DoleanceUserFilteredList.clear();
+  }
 }
