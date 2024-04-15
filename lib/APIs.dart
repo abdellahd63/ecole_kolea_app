@@ -850,6 +850,11 @@ class APIs {
           Overlay.of(context),
           CustomSnackBar.error(
             message: data['message'].toString(),
+            textStyle: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: Colors.white
+            ),
           ),
         );
         return '';
@@ -867,18 +872,8 @@ class APIs {
     // Return an empty map in case of an error
     return '';
   }
-  static Future<String> PostPresence(BuildContext context, String creneau) async {
+  static Future<void> PostPresence(BuildContext context, String creneau) async {
     try {
-      if(creneau.isEmpty){
-        Navigator.of(context).pop();
-        showTopSnackBar(
-          Overlay.of(context),
-          CustomSnackBar.info(
-            message: "Scannez à nouveau le code QR",
-          ),
-        );
-        return '';
-      }
 
       final SharedPreferences preferences = await SharedPreferences.getInstance();
 
@@ -923,8 +918,6 @@ class APIs {
         ),
       );
     }
-    // Return an empty map in case of an error
-    return '';
   }
 
 

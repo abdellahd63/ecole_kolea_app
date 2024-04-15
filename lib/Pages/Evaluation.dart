@@ -57,46 +57,25 @@ class _EvaluationState extends State<Evaluation> {
                               scrollDirection: Axis.horizontal,
                               itemCount: AffichageData.length,
                               itemBuilder:(context, index) {
-                                return Column(
-                                  children: [
-                                    Text(
-                                      (AffichageData[index].semestre.toString() == '01' || AffichageData[index].semestre.toString() == '02'
-                                          ? '1er '
-                                          : (AffichageData[index].semestre.toString() == '03' || AffichageData[index].semestre.toString() == '04'
-                                              ? '2eme '
-                                              :(AffichageData[index].semestre.toString() == '05' || AffichageData[index].semestre.toString() == '06'
-                                                    ? '3eme '
-                                                    :'4eme '
-                                                )
-                                            )
-                                      )
-                                          +'annnee',
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        color: MyAppColors.gray400
-                                      ),
-                                    ),
-                                    InkWell(
-                                      onTap: (){
-                                        changeTab(index);
-                                        setAffichageID(AffichageData[index].id);
-                                      },
-                                      child: AnimatedContainer(
-                                        duration: Duration(microseconds: 300),
-                                        width: 85,
-                                        height: 20,
-                                        margin: EdgeInsets.symmetric(horizontal: 5,),
+                                return InkWell(
+                                  onTap: (){
+                                    changeTab(index);
+                                    setAffichageID(AffichageData[index].id);
+                                  },
+                                  child: AnimatedContainer(
+                                    duration: Duration(microseconds: 300),
+                                    width: 85,
+                                    height: 20,
+                                    margin: EdgeInsets.symmetric(horizontal: 5,),
 
-                                        decoration: BoxDecoration(
-                                          color: currentTab == index ? MyAppColors.principalcolor: MyAppColors.dimopacityvblue,
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                        child: Center(
-                                          child: Text('S${AffichageData[index].semestre}', style: TextStyle(color: currentTab == index ? MyAppColors.whitecolor: MyAppColors.principalcolor),),
-                                        ),
-                                      ),
+                                    decoration: BoxDecoration(
+                                      color: currentTab == index ? MyAppColors.principalcolor: MyAppColors.dimopacityvblue,
+                                      borderRadius: BorderRadius.circular(10),
                                     ),
-                                  ],
+                                    child: Center(
+                                      child: Text('S${AffichageData[index].semestre}', style: TextStyle(color: currentTab == index ? MyAppColors.whitecolor: MyAppColors.principalcolor),),
+                                    ),
+                                  ),
                                 );
                               },
 

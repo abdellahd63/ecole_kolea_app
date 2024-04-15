@@ -24,15 +24,40 @@ class ConnectedHomePage extends StatefulWidget {
 
 class _ConnectedHomePage extends State<ConnectedHomePage> {
 
+  String mysourceID = "";
+  static String mysourceType = "";
   int _selectedIndex=0;
+  void fetchInitData() async{
+    final SharedPreferences preferences = await SharedPreferences.getInstance();
+    setState(() {
+      mysourceID = preferences.getString("id").toString();
+      mysourceType = preferences.getString("type").toString();
+    });
+  }
+  static  List<Widget> routes= [
+    const Presentation(),
+    const Filiere() ,
+    Bibiotheque(),
+    const Profil(),
+    const Programmes(),
+    const Evaluation(),
+    const Notifications(),
+    Doleance(),
+    Presence(),
+    const Contact()
+  ];
 
-    static  List<Widget> routes=[ const Presentation(), const Filiere() ,  Bibiotheque(),const Profil(),const Programmes(),const Evaluation(),const Notifications(),Doleance(),  Presence(),const Contact()];
+  void _onitemtapped(int index){
+    setState(() {
+      _selectedIndex=index;
+    });
+  }
 
-    void _onitemtapped(int index){
-      setState(() {
-        _selectedIndex=index;
-      });
-    }
+  @override
+  void initState() {
+    fetchInitData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -121,7 +146,7 @@ class _ConnectedHomePage extends State<ConnectedHomePage> {
                Navigator.pop(context);
               },  
             ),
-
+            if(mysourceType == "etudiant")
             ListTile(
               leading: Icon(CupertinoIcons.calendar),
               selected: _selectedIndex==4,
@@ -137,7 +162,7 @@ class _ConnectedHomePage extends State<ConnectedHomePage> {
                Navigator.pop(context);
               },  
             ),
-
+            if(mysourceType == "etudiant")
             ListTile(
               leading: Icon(Icons.notes),
               selected: _selectedIndex==5,
@@ -153,7 +178,7 @@ class _ConnectedHomePage extends State<ConnectedHomePage> {
                Navigator.pop(context);
               },  
             ),
-
+            if(mysourceType == "etudiant")
             ListTile(
               leading: Icon(Icons.notifications),
               selected: _selectedIndex==6,
@@ -185,7 +210,7 @@ class _ConnectedHomePage extends State<ConnectedHomePage> {
               }, 
             ),
 
-
+            if(mysourceType == "enseignant" || mysourceType == "etudiant")
             ListTile(
               leading: Icon(Icons.qr_code_scanner),
               selected: _selectedIndex==8,
