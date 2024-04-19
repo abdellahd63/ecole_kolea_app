@@ -30,4 +30,5 @@ class ClasseChat{
       sectionName: json['sectionName'].toString(),
       type: 'classe',
     );
-  }}
+  }
+}

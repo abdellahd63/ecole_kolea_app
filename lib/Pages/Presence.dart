@@ -4,10 +4,11 @@ import 'package:date_time/date_time.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:ecole_kolea_app/APIs.dart';
 import 'package:ecole_kolea_app/Constantes/Colors.dart';
+import 'package:ecole_kolea_app/Model/Creneau.dart';
 import 'package:ecole_kolea_app/Model/Filiere.dart';
 import 'package:ecole_kolea_app/Model/Groupe.dart';
 import 'package:ecole_kolea_app/Model/Section.dart';
-import 'package:ecole_kolea_app/controllers/GroupeChatController.js.dart';
+import 'package:ecole_kolea_app/controllers/SelectionController.dart';
 import 'package:ecole_kolea_app/controllers/QRcodeController.dart';
 import 'package:ecole_kolea_app/util/Encryption.dart';
 import 'package:flutter/cupertino.dart';
@@ -29,26 +30,28 @@ class Presence extends StatefulWidget {
 
 class _PresenceState extends State<Presence> {
   TextEditingController textEditingController = TextEditingController();
-  final GroupeChat = Get.put(GroupeChatController());
+  final selectionController = Get.put(SelectionController());
   final QRCODEController = Get.put(QRcodeController());
 
   String qrstr="";
   String QRCodeData= "";
   String mysourceID = "";
   String mysourceType = "";
-  int timeleft = 0;
+  bool isPastEndTime = false;
   void fetchinitData() async{
     final SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
       mysourceID = preferences.getString("id").toString();
       mysourceType = preferences.getString("type").toString();
     });
-    if(mysourceType == 'enseignant' && GroupeChat.Filiereitems.value.length <= 0){
+    if(mysourceType == 'enseignant'){
       final F_S_G_ByIDEnseignantData = await APIs.GetF_S_G_ByIDEnseignant(context);
+      List<dynamic> CreneauByIDEnsegniantData = await APIs.GetAllCreneauByIDEnsegniant(context);
       setState(() {
-        GroupeChat.Filiereitems.value = F_S_G_ByIDEnseignantData["filieres"].map<Filiere>((item) => Filiere.fromJson(item)).toList();
-        GroupeChat.Sectionitems.value = F_S_G_ByIDEnseignantData["sections"].map<Section>((item) => Section.fromJson(item)).toList();
-        GroupeChat.Groupeitems.value = F_S_G_ByIDEnseignantData["groupes"].map<Groupe>((item) => Groupe.fromJson(item)).toList();
+        selectionController.Filiereitems.value = F_S_G_ByIDEnseignantData["filieres"].map<Filiere>((item) => Filiere.fromJson(item)).toList();
+        selectionController.Sectionitems.value = F_S_G_ByIDEnseignantData["sections"].map<Section>((item) => Section.fromJson(item)).toList();
+        selectionController.Groupeitems.value = F_S_G_ByIDEnseignantData["groupes"].map<Groupe>((item) => Groupe.fromJson(item)).toList();
+        selectionController.Timeitems.value = CreneauByIDEnsegniantData.map<Creneau>((item) => Creneau.fromJson(item)).toList();
       });
     }
   }
@@ -61,6 +64,16 @@ class _PresenceState extends State<Presence> {
         String holder = QRCODEController.QrCodeData.value;
         QRCODEController.QrCodeData.value = '';
         QRCODEController.QrCodeData.value = holder;
+        String endTime = selectionController.TimetextSelection.value.split("/")[1].toString();
+        List<String> parts = endTime.split(':');
+        int hour = int.parse(parts[0]);
+        int minute = int.parse(parts[1]);
+        int second = int.parse(parts[2]);
+        DateTime endDateTime = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, hour, minute, second);
+        print(DateTime.now());
+        print(endDateTime);
+        isPastEndTime = DateTime.now().isAfter(endDateTime);
+        print(isPastEndTime);
       }
     });
   }
@@ -150,20 +163,20 @@ class _PresenceState extends State<Presence> {
                                                             color: Theme.of(context).hintColor,
                                                           ),
                                                         ),
-                                                        items: GroupeChat.Filiereitems.value.map((item) =>
+                                                        items: selectionController.Filiereitems.value.map((item) =>
                                                             DropdownMenuItem(
                                                               value: item.id.toString(),
                                                               child: Text(item.libelle.toString()),
                                                             )
                                                         ).toList(),
-                                                        value: GroupeChat.FilieretextSelection.value.isEmpty
+                                                        value: selectionController.FilieretextSelection.value.isEmpty
                                                             ? null
-                                                            : GroupeChat.FilieretextSelection.value,
+                                                            : selectionController.FilieretextSelection.value,
                                                         onChanged: (value) {
                                                           setState(() {
-                                                            GroupeChat.FilieretextSelection.value = value!;
-                                                            GroupeChat.SectiontextSelection.value = '';
-                                                            GroupeChat.GroupetextSelection.value = '';
+                                                            selectionController.FilieretextSelection.value = value!;
+                                                            selectionController.SectiontextSelection.value = '';
+                                                            selectionController.GroupetextSelection.value = '';
                                                           });
                                                         },
                                                         buttonStyleData: const ButtonStyleData(
@@ -239,8 +252,8 @@ class _PresenceState extends State<Presence> {
                                                             color: Theme.of(context).hintColor,
                                                           ),
                                                         ),
-                                                        items: GroupeChat.Sectionitems.value
-                                                            .where((item) => item.filiere.toString() == GroupeChat.FilieretextSelection.value)
+                                                        items: selectionController.Sectionitems.value
+                                                            .where((item) => item.filiere.toString() == selectionController.FilieretextSelection.value)
                                                             .map((item) =>
                                                             DropdownMenuItem(
                                                               value: item.id.toString(),
@@ -257,13 +270,13 @@ class _PresenceState extends State<Presence> {
                                                               ),
                                                             )
                                                         ).toList(),
-                                                        value: GroupeChat.SectiontextSelection.value.isEmpty
+                                                        value: selectionController.SectiontextSelection.value.isEmpty
                                                             ? null
-                                                            : GroupeChat.SectiontextSelection.value,
+                                                            : selectionController.SectiontextSelection.value,
                                                         onChanged: (value) {
                                                           setState(() {
-                                                            GroupeChat.SectiontextSelection.value = value!;
-                                                            GroupeChat.GroupetextSelection.value = '';
+                                                            selectionController.SectiontextSelection.value = value!;
+                                                            selectionController.GroupetextSelection.value = '';
                                                           });
                                                         },
                                                         buttonStyleData: const ButtonStyleData(
@@ -339,8 +352,8 @@ class _PresenceState extends State<Presence> {
                                                             color: Theme.of(context).hintColor,
                                                           ),
                                                         ),
-                                                        items: GroupeChat.Groupeitems.value
-                                                            .where((item) => item.section.toString() == GroupeChat.SectiontextSelection.value)
+                                                        items: selectionController.Groupeitems.value
+                                                            .where((item) => item.section.toString() == selectionController.SectiontextSelection.value)
                                                             .map((item) =>
                                                             DropdownMenuItem(
                                                               value: item.id.toString(),
@@ -357,12 +370,12 @@ class _PresenceState extends State<Presence> {
                                                               ),
                                                             )
                                                         ).toList(),
-                                                        value: GroupeChat.GroupetextSelection.value.isEmpty
+                                                        value: selectionController.GroupetextSelection.value.isEmpty
                                                             ? null
-                                                            : GroupeChat.GroupetextSelection.value,
+                                                            : selectionController.GroupetextSelection.value,
                                                         onChanged: (value) {
                                                           setState(() {
-                                                            GroupeChat.GroupetextSelection.value = value!;
+                                                            selectionController.GroupetextSelection.value = value!;
                                                           });
                                                         },
                                                         buttonStyleData: const ButtonStyleData(
@@ -438,15 +451,16 @@ class _PresenceState extends State<Presence> {
                                                             color: Theme.of(context).hintColor,
                                                           ),
                                                         ),
-                                                        items: GroupeChat.Timeitems.value
+                                                        items: selectionController.Timeitems.value
+                                                            .where((item) => item.groupe.toString() == selectionController.GroupetextSelection.value)
                                                             .map((item) =>
                                                             DropdownMenuItem(
-                                                              value: item,
+                                                              value: '${item.horaire_debut.toString()}/${item.horaire_fin.toString()}',
                                                               child: Column(
                                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                                 children: [
                                                                   Text(
-                                                                    item,
+                                                                    item.horaire_debut.toString(),
                                                                     style: TextStyle(
                                                                       fontSize: 14,
                                                                     ),
@@ -455,12 +469,12 @@ class _PresenceState extends State<Presence> {
                                                               ),
                                                             )
                                                         ).toList(),
-                                                        value: GroupeChat.TimetextSelection.value.isEmpty
+                                                        value: selectionController.TimetextSelection.value.isEmpty
                                                             ? null
-                                                            : GroupeChat.TimetextSelection.value,
+                                                            : selectionController.TimetextSelection.value,
                                                         onChanged: (value) {
                                                           setState(() {
-                                                            GroupeChat.TimetextSelection.value = value!;
+                                                            selectionController.TimetextSelection.value = value!;
                                                           });
                                                         },
                                                         buttonStyleData: const ButtonStyleData(
@@ -546,7 +560,7 @@ class _PresenceState extends State<Presence> {
                                                           ),
                                                           onTap: (){
                                                             Navigator.of(context).pop();
-                                                            GroupeChat.ClearAll();
+                                                            selectionController.ClearAll();
                                                           },
                                                         ),
                                                       ),
@@ -603,13 +617,13 @@ class _PresenceState extends State<Presence> {
                                                               },
                                                             );
                                                             QRCODEController.QrCodeData.value = await APIs.GetCreneau(context,
-                                                                GroupeChat.TimetextSelection.value.toString(),
-                                                                GroupeChat.GroupetextSelection.value.toString()
+                                                                selectionController.TimetextSelection.value.split('/')[0].toString(),
+                                                                selectionController.GroupetextSelection.value.toString()
                                                             );
                                                             if(QRCODEController.QrCodeData.value.isNotEmpty){
                                                               QRCODEController.QrOpacity.value = 1;
                                                             }
-                                                            GroupeChat.ClearAll();
+                                                            selectionController.ClearAll();
                                                             Timerleft();
                                                           },
                                                         ),
@@ -644,6 +658,10 @@ class _PresenceState extends State<Presence> {
                                   : InkWell(
                                     onTap: (){
                                       QRCODEController.Clear();
+                                      setState(() {
+                                        selectionController.TimetextSelection.value = '';
+                                        isPastEndTime = false;
+                                      });
                                     },
                                     child: Container(
                                       decoration: BoxDecoration(
@@ -664,18 +682,41 @@ class _PresenceState extends State<Presence> {
                             ],
                           )),
                         ),
-                        SizedBox(height: 100,),
+                        SizedBox(height: 90,),
                         Obx(() =>
                             Column(
                               children: [
                                 if(QRCODEController.QrCodeData.value.isNotEmpty)
-                                  Padding(
-                                    padding: const EdgeInsets.all(15.0),
-                                    child: Text('Vous pouvez scanner maintenant',
-                                      style: TextStyle(
-                                          color: Colors.green
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                     children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(15.0),
+                                        child: Text('Vous pouvez scanner maintenant',
+                                          style: TextStyle(
+                                            color: isPastEndTime ? Colors.red : Colors.green,
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            selectionController.TimetextSelection.value.split("/")[0].toString(),
+                                            style: TextStyle(
+                                              color: isPastEndTime ? Colors.red : Colors.green,
+                                            ),
+                                          ),
+                                          SizedBox(width: 40),
+                                          Text(
+                                            selectionController.TimetextSelection.value.split("/")[1].toString(),
+                                            style: TextStyle(
+                                              color: isPastEndTime ? Colors.red : Colors.green,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
                                 Opacity(
                                   opacity: QRCODEController.QrOpacity.value,
@@ -683,6 +724,7 @@ class _PresenceState extends State<Presence> {
                                     data: Encryption.encryptAES(QRCODEController.QrCodeData.value.isNotEmpty ? '${DateTime.now()}#${QRCODEController.QrCodeData.value}': ''),
                                     version: QrVersions.auto,
                                     size: 300.0,
+                                    foregroundColor: isPastEndTime ? Colors.red : Colors.black,
                                   ),
                                 ),
                               ],

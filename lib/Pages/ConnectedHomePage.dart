@@ -11,7 +11,7 @@ import 'package:ecole_kolea_app/Pages/Presence.dart';
 import 'package:ecole_kolea_app/Pages/Presentation.dart';
 import 'package:ecole_kolea_app/Pages/Profil.dart';
 import 'package:ecole_kolea_app/Pages/Programmes.dart';
-import 'package:ecole_kolea_app/controllers/GroupeChatController.js.dart';
+import 'package:ecole_kolea_app/controllers/SelectionController.dart';
 import 'package:ecole_kolea_app/controllers/QRcodeController.dart';
 import 'package:ecole_kolea_app/controllers/Searching.dart';
 import 'package:flutter/cupertino.dart';
@@ -39,12 +39,13 @@ class _ConnectedHomePage extends State<ConnectedHomePage> {
   }
   void ClearControllers(){
     final searching = Get.put(Searching());
-    final GroupeChat = Get.put(GroupeChatController());
+    final selectionController = Get.put(SelectionController());
     final Qrcode = Get.put(QRcodeController());
 
     searching.ClearAll();
-    GroupeChat.ClearAllItems();
-    GroupeChat.ClearAll();
+    selectionController.ClearAllItems();
+    selectionController.ClearAll();
+    selectionController.TimetextSelection.value = '';
     Qrcode.Clear();
   }
   static  List<Widget> routes= [

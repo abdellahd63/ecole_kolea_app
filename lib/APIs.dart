@@ -811,6 +811,7 @@ class APIs {
   }
 
   //Presence
+  //Get specific creneau
   static Future<String> GetCreneau(BuildContext context, String time, String groupe) async {
     try {
       if(time.isEmpty ||
@@ -872,6 +873,7 @@ class APIs {
     // Return an empty map in case of an error
     return '';
   }
+  //add my presence
   static Future<void> PostPresence(BuildContext context, String creneau) async {
     try {
 
@@ -918,6 +920,40 @@ class APIs {
         ),
       );
     }
+  }
+  //get all créaneaux by id ensegniant
+  static Future<List<dynamic>> GetAllCreneauByIDEnsegniant(BuildContext context) async {
+    try {
+      final SharedPreferences preferences = await SharedPreferences.getInstance();
+      String IDEnseignant = preferences.getString("id").toString();
+
+      await initializeDateFormatting('fr_FR', null);
+      String dayName = DateFormat('EEEE', 'fr_FR').format(DateTime.now());
+
+      final response = await http.get(
+        Uri.parse('${API_URL}/api/creneau/All/${IDEnseignant}/${dayName}'),
+        headers: {'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${preferences.getString("token").toString()}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> responseData = json.decode(response.body);
+        return responseData;
+      } else {
+        print('Error receiving Creneau data: ${response.body}');
+      }
+    } catch (error) {
+      print('Error fetching Creneau data: $error');
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: 'vérifier votre internet',
+        ),
+      );
+    }
+    // Return an empty list in case of an error
+    return [];
   }
 
 

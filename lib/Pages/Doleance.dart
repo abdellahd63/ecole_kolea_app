@@ -10,7 +10,7 @@ import 'package:ecole_kolea_app/Model/Section.dart';
 import 'package:ecole_kolea_app/Model/Section.dart';
 import 'package:ecole_kolea_app/Model/User.dart';
 import 'package:ecole_kolea_app/Model/UserAdmin.dart';
-import 'package:ecole_kolea_app/controllers/GroupeChatController.js.dart';
+import 'package:ecole_kolea_app/controllers/SelectionController.dart';
 import 'package:ecole_kolea_app/controllers/Searching.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -26,7 +26,7 @@ class Doleance extends StatefulWidget {
 class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
   TextEditingController textEditingController = TextEditingController();
   final searching = Get.put(Searching());
-  final GroupeChat = Get.put(GroupeChatController());
+  final selectionController = Get.put(SelectionController());
 
   String mysourceID = "";
   String mysourceType = "";
@@ -45,7 +45,7 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
         mysourceID
     );
     if(room.length > 0){
-      GroupeChat.ClearAll();
+      selectionController.ClearAll();
     }
   }
   Future<void> fetchCurrentUserData() async {
@@ -58,9 +58,9 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
       final F_S_G_ByIDEnseignantData = await APIs.GetF_S_G_ByIDEnseignant(context);
       final StudentsByGroupData = await APIs.GetStudentsByGroup(context, F_S_G_ByIDEnseignantData["groupes"]);
       setState(() {
-        GroupeChat.Filiereitems.value = F_S_G_ByIDEnseignantData["filieres"].map<Filiere>((item) => Filiere.fromJson(item)).toList();
-        GroupeChat.Sectionitems.value = F_S_G_ByIDEnseignantData["sections"].map<Section>((item) => Section.fromJson(item)).toList();
-        GroupeChat.Groupeitems.value = F_S_G_ByIDEnseignantData["groupes"].map<Groupe>((item) => Groupe.fromJson(item)).toList();
+        selectionController.Filiereitems.value = F_S_G_ByIDEnseignantData["filieres"].map<Filiere>((item) => Filiere.fromJson(item)).toList();
+        selectionController.Sectionitems.value = F_S_G_ByIDEnseignantData["sections"].map<Section>((item) => Section.fromJson(item)).toList();
+        selectionController.Groupeitems.value = F_S_G_ByIDEnseignantData["groupes"].map<Groupe>((item) => Groupe.fromJson(item)).toList();
         users = StudentsByGroupData.map<User>((item) => User.fromJson(item, 'etudiant')).toList();
         searching.DoleanceFilteredList.value = List<User>.from(users);
         loading = false;
@@ -212,20 +212,20 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
                                         color: Theme.of(context).hintColor,
                                       ),
                                     ),
-                                    items: GroupeChat.Filiereitems.value.map((item) =>
+                                    items: selectionController.Filiereitems.value.map((item) =>
                                         DropdownMenuItem(
                                           value: item.id.toString(),
                                           child: Text(item.libelle.toString()),
                                         )
                                     ).toList(),
-                                    value: GroupeChat.FilieretextSelection.value.isEmpty
+                                    value: selectionController.FilieretextSelection.value.isEmpty
                                         ? null
-                                        : GroupeChat.FilieretextSelection.value,
+                                        : selectionController.FilieretextSelection.value,
                                     onChanged: (value) {
                                       setState(() {
-                                        GroupeChat.FilieretextSelection.value = value!;
-                                        GroupeChat.SectiontextSelection.value = '';
-                                        GroupeChat.GroupetextSelection.value = '';
+                                        selectionController.FilieretextSelection.value = value!;
+                                        selectionController.SectiontextSelection.value = '';
+                                        selectionController.GroupetextSelection.value = '';
                                       });
                                     },
                                     buttonStyleData: const ButtonStyleData(
@@ -301,8 +301,8 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
                                       color: Theme.of(context).hintColor,
                                     ),
                                   ),
-                                  items: GroupeChat.Sectionitems.value
-                                      .where((item) => item.filiere.toString() == GroupeChat.FilieretextSelection.value)
+                                  items: selectionController.Sectionitems.value
+                                      .where((item) => item.filiere.toString() == selectionController.FilieretextSelection.value)
                                       .map((item) =>
                                       DropdownMenuItem(
                                         value: item.id.toString(),
@@ -319,13 +319,13 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
                                         ),
                                       )
                                   ).toList(),
-                                  value: GroupeChat.SectiontextSelection.value.isEmpty
+                                  value: selectionController.SectiontextSelection.value.isEmpty
                                       ? null
-                                      : GroupeChat.SectiontextSelection.value,
+                                      : selectionController.SectiontextSelection.value,
                                   onChanged: (value) {
                                     setState(() {
-                                      GroupeChat.SectiontextSelection.value = value!;
-                                      GroupeChat.GroupetextSelection.value = '';
+                                      selectionController.SectiontextSelection.value = value!;
+                                      selectionController.GroupetextSelection.value = '';
                                     });
                                   },
                                   buttonStyleData: const ButtonStyleData(
@@ -401,8 +401,8 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
                                       color: Theme.of(context).hintColor,
                                     ),
                                   ),
-                                  items: GroupeChat.Groupeitems.value
-                                      .where((item) => item.section.toString() == GroupeChat.SectiontextSelection.value)
+                                  items: selectionController.Groupeitems.value
+                                      .where((item) => item.section.toString() == selectionController.SectiontextSelection.value)
                                       .map((item) =>
                                       DropdownMenuItem(
                                         value: item.id.toString(),
@@ -419,12 +419,12 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
                                         ),
                                       )
                                   ).toList(),
-                                  value: GroupeChat.GroupetextSelection.value.isEmpty
+                                  value: selectionController.GroupetextSelection.value.isEmpty
                                       ? null
-                                      : GroupeChat.GroupetextSelection.value,
+                                      : selectionController.GroupetextSelection.value,
                                   onChanged: (value) {
                                     setState(() {
-                                      GroupeChat.GroupetextSelection.value = value!;
+                                      selectionController.GroupetextSelection.value = value!;
                                     });
                                   },
                                   buttonStyleData: const ButtonStyleData(
@@ -510,7 +510,7 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
                                         ),
                                         onTap: (){
                                           Navigator.of(context).pop();
-                                          GroupeChat.ClearAll();
+                                          selectionController.ClearAll();
                                         },
                                       ),
                                     ),
@@ -567,9 +567,9 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
                                             },
                                           );
                                           createNewRoom(
-                                              GroupeChat.FilieretextSelection.value,
-                                              GroupeChat.SectiontextSelection.value,
-                                              GroupeChat.GroupetextSelection.value
+                                              selectionController.FilieretextSelection.value,
+                                              selectionController.SectiontextSelection.value,
+                                              selectionController.GroupetextSelection.value
                                           );
                                         },
                                       ),
