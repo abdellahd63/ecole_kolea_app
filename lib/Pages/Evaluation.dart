@@ -14,10 +14,16 @@ class Evaluation extends StatefulWidget {
 
 class _EvaluationState extends State<Evaluation> {
   int currentTab=0;
+  int currentSemesterTab=0;
 
   void changeTab(int index){
     setState(() {
       currentTab=index;
+    });
+  }
+  void changeSemesterTab(int index){
+    setState(() {
+      currentSemesterTab=index;
     });
   }
   late int? affichageID = null;
@@ -26,7 +32,20 @@ class _EvaluationState extends State<Evaluation> {
       affichageID= id;
     });
   }
-
+  List<Affichage> Semesters = [];
+  int? cycleID = null;
+  List<Affichage> filterDuplicates<Affichage>(List<Affichage> list, int Function(Affichage) idSelector) {
+    Set<int> uniqueIds = Set();
+    List<Affichage> filteredList = [];
+    for (Affichage item in list) {
+      int id = idSelector(item);
+      if (!uniqueIds.contains(id)) {
+        uniqueIds.add(id);
+        filteredList.add(item);
+      }
+    }
+    return filteredList;
+  }
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<dynamic>(
@@ -44,6 +63,9 @@ class _EvaluationState extends State<Evaluation> {
                   return Center(child: Text('No data available.'));
                 if(affichageID == null)
                 affichageID = AffichageData[0].id;
+                if(cycleID == null)
+                Semesters = AffichageData.where((item) => item.anneeID == AffichageData[0].anneeID).toList();
+                List<Affichage> filtredAffichageData = filterDuplicates(AffichageData, (item) => item.anneeID);
                 return Scaffold(
                   body: SingleChildScrollView(
                     child: Column(
@@ -55,25 +77,28 @@ class _EvaluationState extends State<Evaluation> {
                             height: 45,
                             child: ListView.builder(
                               scrollDirection: Axis.horizontal,
-                              itemCount: AffichageData.length,
+                              itemCount: filtredAffichageData.length,
                               itemBuilder:(context, index) {
                                 return InkWell(
                                   onTap: (){
                                     changeTab(index);
-                                    setAffichageID(AffichageData[index].id);
+                                    changeSemesterTab(0);
+                                    affichageID = AffichageData[index].id;
+                                    cycleID = filtredAffichageData[index].anneeID;
+                                    Semesters = AffichageData.where((item) => item.anneeID == cycleID).toList();
                                   },
                                   child: AnimatedContainer(
                                     duration: Duration(microseconds: 300),
-                                    width: 85,
+                                    width: 100,
                                     height: 20,
                                     margin: EdgeInsets.symmetric(horizontal: 5,),
-
+                                    padding: EdgeInsets.symmetric(horizontal: 5,vertical: 5),
                                     decoration: BoxDecoration(
                                       color: currentTab == index ? MyAppColors.principalcolor: MyAppColors.dimopacityvblue,
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: Center(
-                                      child: Text('S${AffichageData[index].semestre}', style: TextStyle(color: currentTab == index ? MyAppColors.whitecolor: MyAppColors.principalcolor),),
+                                      child: Text('${filtredAffichageData[index].annee}', style: TextStyle(color: currentTab == index ? MyAppColors.whitecolor: MyAppColors.principalcolor),),
                                     ),
                                   ),
                                 );
@@ -82,6 +107,42 @@ class _EvaluationState extends State<Evaluation> {
                             ),
                           ),
                         ),
+                        if(Semesters.length == 2)
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 0,vertical: 10),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                ElevatedButton(
+                                  onPressed: () {
+                                    changeSemesterTab(0);
+                                    setAffichageID(Semesters[0].id);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    elevation: 0.0, // Remove shadow
+                                    textStyle: const TextStyle(color: Colors.white),
+                                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                                    backgroundColor: currentSemesterTab == 0 ? MyAppColors.principalcolor: MyAppColors.dimopacityvblue,
+                                  ),
+                                  child: Text('${Semesters[0].semestre}', style: TextStyle(color: currentSemesterTab == 0 ? MyAppColors.whitecolor: MyAppColors.principalcolor),),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    changeSemesterTab(1);
+                                    setAffichageID(Semesters[1].id);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    elevation: 0.0, // Remove shadow
+                                    textStyle: const TextStyle(color: Colors.white),
+                                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                                    backgroundColor: currentSemesterTab == 1 ? MyAppColors.principalcolor: MyAppColors.dimopacityvblue,
+                                  ),
+                                  child: Text('${Semesters[1].semestre}', style: TextStyle(color: currentSemesterTab == 1 ? MyAppColors.whitecolor: MyAppColors.principalcolor),),
+                                ),
+                              ],
+                            ),
+                          ),
                         //Moyenne
                         if(affichageID != null)
                           EvaluationList(

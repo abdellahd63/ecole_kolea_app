@@ -178,20 +178,13 @@ class Profil extends StatelessWidget {
                                         child: Row(
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
-                                            Text('Cycle ',
+                                            Text('${userData["cycle"].toString()}',
                                               style: TextStyle(
                                                   color: MyAppColors.principalcolor,
                                                   fontWeight: FontWeight.w600,
                                                   fontSize: 14
                                               ),
                                             ),
-                                            Text(
-                                              '${userData["cycle"].toString()} année',
-                                              style: TextStyle(
-                                                  color: MyAppColors.principalcolor,
-                                                  fontSize: 14
-                                              ),
-                                            )
                                           ],
                                         ),
                                       )
@@ -210,19 +203,13 @@ class Profil extends StatelessWidget {
                                         child: Row(
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
-                                            Text('Filière ',
+                                            Text('${userData["filiereName"].toString()}',
                                               style: TextStyle(
                                                   color: MyAppColors.principalcolor,
                                                   fontWeight: FontWeight.w600,
                                                   fontSize: 14
                                               ),
                                             ),
-                                            Text('${userData["filiereName"].toString()}',
-                                              style: TextStyle(
-                                                  color: MyAppColors.principalcolor,
-                                                  fontSize: 14
-                                              ),
-                                            )
                                           ],
                                         ),
                                       )
@@ -244,21 +231,13 @@ class Profil extends StatelessWidget {
                                               child: Row(
                                                 mainAxisAlignment: MainAxisAlignment.center,
                                                 children: [
-                                                  Text('Section ',
+                                                  Text('${userData["sectionName"].toString()}',
                                                     style: TextStyle(
                                                         color: MyAppColors.principalcolor,
                                                         fontWeight: FontWeight.w600,
                                                         fontSize: 14
                                                     ),
                                                   ),
-
-                                                  Text('${userData["sectionName"].toString()}',
-                                                    style: TextStyle(
-                                                        color: MyAppColors.principalcolor,
-
-                                                        fontSize: 14
-                                                    ),
-                                                  )
                                                 ],
                                               ),
                                             )),
@@ -273,19 +252,13 @@ class Profil extends StatelessWidget {
                                           child: Row(
                                             mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
-                                              Text('Groupe ',
+                                              Text('${userData['groupeName']}',
                                                 style: TextStyle(
                                                     color: MyAppColors.principalcolor,
                                                     fontWeight: FontWeight.w600,
                                                     fontSize: 14
                                                 ),
                                               ),
-                                              Text('${userData['groupe']}',
-                                                style: TextStyle(
-                                                    color: MyAppColors.principalcolor,
-                                                    fontSize: 14
-                                                ),
-                                              )
                                             ],
                                           ),
                                         )),

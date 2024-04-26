@@ -50,7 +50,7 @@ class Livres extends StatelessWidget {
                   } else if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}');
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Text('Aucun document disponible.');
+                    return Center(child: Text('Aucun document disponible.'));
                   } else {
                     List<Document> documentData = List<Document>.from(snapshot.data!.map<Document>((item) => Document.fromJson(item)));
                     if(searching.DocumentSearchingtextController.text.isEmpty) {
@@ -92,27 +92,7 @@ class Livres extends StatelessWidget {
                               child: ListTile(
                                 tileColor: MyAppColors.dimopacityvblue,
                                 title: Text('${searching.DocumentFilteredList[index].nom_document}'),
-                                subtitle: Row(
-                                  children: [
-                                    Text(
-                                      searching.DocumentFilteredList[index].disponibilite != 0
-                                          ? "disponible : "
-                                          : "indisponible",
-                                      style: TextStyle(
-                                        color: searching.DocumentFilteredList[index].disponibilite != 0
-                                            ? Colors.green
-                                            : Colors.red
-                                      ),
-                                    ),
-                                    if(searching.DocumentFilteredList[index].disponibilite > 0)
-                                    Text('${searching.DocumentFilteredList[index].disponibilite}',
-                                      style: TextStyle(
-                                          color: Colors.green
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                trailing: Icon(Icons.download),
+                                trailing: Icon(Icons.open_in_new),
                               ),
                             );
                           },

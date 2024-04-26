@@ -2,6 +2,7 @@ import 'package:ecole_kolea_app/APIs.dart';
 import 'package:ecole_kolea_app/Constantes/Colors.dart';
 import 'package:ecole_kolea_app/Model/Bibliotheque.dart';
 import 'package:ecole_kolea_app/Pages/Categorie.dart';
+import 'package:ecole_kolea_app/Pages/Livres.dart';
 import 'package:ecole_kolea_app/controllers/Searching.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -109,7 +110,7 @@ class Bibiotheque extends StatelessWidget {
                                 ),
                               ),
                               onTap: (){
-                                Navigator.of(context).push(MaterialPageRoute(builder: (context)=>Categorie(bibliotheque: bibliothequeData[index].id.toString(), name: bibliothequeData[index].libelle.toString())));
+                                Navigator.of(context).push(MaterialPageRoute(builder: (context)=>Livres(Categorie: bibliothequeData[index].id.toString(), name: bibliothequeData[index].libelle.toString())));
                               },
                             );
                           },

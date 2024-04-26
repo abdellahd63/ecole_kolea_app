@@ -53,6 +53,7 @@ class _PresenceState extends State<Presence> {
         selectionController.Groupeitems.value = F_S_G_ByIDEnseignantData["groupes"].map<Groupe>((item) => Groupe.fromJson(item)).toList();
         selectionController.Timeitems.value = CreneauByIDEnsegniantData.map<Creneau>((item) => Creneau.fromJson(item)).toList();
       });
+      print(selectionController.Timeitems.value);
     }
   }
 
@@ -261,7 +262,7 @@ class _PresenceState extends State<Presence> {
                                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                                 children: [
                                                                   Text(
-                                                                    'Section '+item.libelle.toString(),
+                                                                    item.libelle.toString(),
                                                                     style: TextStyle(
                                                                       fontSize: 14,
                                                                     ),
@@ -361,7 +362,7 @@ class _PresenceState extends State<Presence> {
                                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                                 children: [
                                                                   Text(
-                                                                    'Groupe '+item.libelle.toString(),
+                                                                    item.libelle.toString(),
                                                                     style: TextStyle(
                                                                       fontSize: 14,
                                                                     ),
