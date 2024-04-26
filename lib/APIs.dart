@@ -956,5 +956,35 @@ class APIs {
     return [];
   }
 
+  //Semester
+  //Get all semesters
+  static Future<List<dynamic>> GetAllSemesters(BuildContext context) async {
+    try {
+      final SharedPreferences preferences = await SharedPreferences.getInstance();
 
+      final response = await http.get(
+        Uri.parse('${API_URL}/api/semester/'),
+        headers: {'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${preferences.getString("token").toString()}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> responseData = json.decode(response.body);
+        return responseData;
+      } else {
+        print('Error receiving semester data: ${response.body}');
+      }
+    } catch (error) {
+      print('Error fetching semester data: $error');
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: 'vérifier votre internet',
+        ),
+      );
+    }
+    // Return an empty list in case of an error
+    return [];
+  }
 }

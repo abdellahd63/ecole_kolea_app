@@ -34,7 +34,7 @@ class _ChatState extends State<Chat> {
   List<Message> messages=[];
   ImagePicker imagePicker = ImagePicker();
   XFile? file;
-  bool loading = false;
+  bool loading = true;
 
   void sendMessage(String msg, String targetID, String path){
     setMessage(msg, mysourceType, path);

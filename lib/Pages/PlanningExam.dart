@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:time_planner/time_planner.dart';
 
 class PlanningExam extends StatelessWidget {
-  PlanningExam({super.key});
-
+  PlanningExam({super.key, required String this.semesterID, required String this.semester});
+  String semester;
+  String semesterID;
 
 
   List<TimePlannerTask> tasks = [
@@ -89,6 +90,17 @@ class PlanningExam extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
+        title: Text('${semester}',
+          textAlign: TextAlign.center,
+          softWrap: true,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: MyAppColors.principalcolor,
+            fontSize: 18,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
         leading: InkWell(
           onTap: () {
             Navigator.pop(context);

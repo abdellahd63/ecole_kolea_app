@@ -46,6 +46,12 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
     );
     if(room.length > 0){
       selectionController.ClearAll();
+      setState(() {
+        ClasseisChanged = false;
+        ClasseIconController.reverse();
+        UserisChanged = false;
+        UserIconController.reverse();
+      });
     }
   }
   Future<void> fetchCurrentUserData() async {

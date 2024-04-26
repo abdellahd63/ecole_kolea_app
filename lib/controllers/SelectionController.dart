@@ -17,16 +17,24 @@ class SelectionController extends GetxController {
   var TimetextSelection = ''.obs;
   var Timeitems = [].obs;
 
+  //Semesters
+  var SemestertextSelection = ''.obs;
+  var SemesterNametextSelection = ''.obs;
+  var Semesteritems = [].obs;
+
   void ClearAll(){
     FilieretextSelection.value = '';
     SectiontextSelection.value = '';
     GroupetextSelection.value = '';
+    SemestertextSelection.value = '';
+    SemesterNametextSelection.value = '';
   }
   void ClearAllItems(){
     Filiereitems.value.clear();
     Sectionitems.value.clear();
     Groupeitems.value.clear();
     Timeitems.value.clear();
+    Semesteritems.value.clear();
   }
 
 }

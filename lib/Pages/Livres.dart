@@ -5,6 +5,7 @@ import 'package:ecole_kolea_app/Model/Document.dart';
 import 'package:ecole_kolea_app/controllers/Searching.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Livres extends StatelessWidget {
   Livres({super.key, required this.Categorie, required this.name});
@@ -92,7 +93,15 @@ class Livres extends StatelessWidget {
                               child: ListTile(
                                 tileColor: MyAppColors.dimopacityvblue,
                                 title: Text('${searching.DocumentFilteredList[index].nom_document}'),
-                                trailing: Icon(Icons.open_in_new),
+                                trailing: GestureDetector(
+                                  onTap: () {
+                                    if(searching.DocumentFilteredList[index].lien_document.toString().isNotEmpty){
+                                      final Uri uri = Uri.parse(searching.DocumentFilteredList[index].lien_document.toString());
+                                      _launchUrl(uri);
+                                    }
+                                  },
+                                  child: Icon(Icons.open_in_new),
+                                ),
                               ),
                             );
                           },
@@ -107,5 +116,10 @@ class Livres extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+Future<void> _launchUrl(Uri url) async {
+  if (!await launchUrl(url)) {
+    throw Exception('Could not launch $url');
   }
 }
