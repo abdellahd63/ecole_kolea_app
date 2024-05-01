@@ -136,7 +136,7 @@ class _ChatState extends State<Chat> {
       mysourceID = preferences.getString("id").toString();
       mysourceType = preferences.getString("type").toString();
     });
-    socket = IO.io('http://192.168.1.100:8000', <String,dynamic>{
+    socket = IO.io(Constant.URL, <String,dynamic>{
       "transports":["websocket"],
       "autoConnect": false,
       'force new connection': true,

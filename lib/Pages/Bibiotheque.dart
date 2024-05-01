@@ -52,7 +52,7 @@ class Bibiotheque extends StatelessWidget {
                   } else if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}');
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Text('Aucune bibliotheque disponible.');
+                    return Center(child: Text('Aucune bibliotheque disponible.'));
                   } else {
                     List<Bibliotheque> bibliothequeData = List<Bibliotheque>.from(snapshot.data!.map<Bibliotheque>((item) => Bibliotheque.fromJson(item)));
                     if(searching.BibliothequeSearchingtextController.text.isEmpty) {

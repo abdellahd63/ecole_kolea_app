@@ -81,7 +81,7 @@ class _NotificationsState extends State<Notifications> {
                     } else if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return Text('Aucune annonce disponible.');
+                      return Center(child: Text('Aucune annonce disponible.'));
                     } else {
                       List<NotificationModel> notificatinsList = List<NotificationModel>.from(snapshot.data!.map<NotificationModel>((item) => NotificationModel.fromJson(item)));
                       return ListView.builder(
@@ -135,7 +135,7 @@ class _NotificationsState extends State<Notifications> {
                     } else if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return Text('Aucune annonce disponible.');
+                      return Center(child: Text('Aucune annonce disponible.'));
                     } else {
                       List<NotificationModel> notificatinsList = List<NotificationModel>.from(snapshot.data!.map<NotificationModel>((item) => NotificationModel.fromJson(item)));
                       return ListView.builder(
@@ -189,7 +189,7 @@ class _NotificationsState extends State<Notifications> {
                     } else if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return Text('Aucune annonce disponible.');
+                      return Center(child: Text('Aucune annonce disponible.'));
                     } else {
                       List<NotificationModel> notificatinsList = List<NotificationModel>.from(snapshot.data!.map<NotificationModel>((item) => NotificationModel.fromJson(item)));
                       return ListView.builder(
@@ -243,7 +243,7 @@ class _NotificationsState extends State<Notifications> {
                     } else if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return Text('Aucune annonce disponible.');
+                      return Center(child: Text('Aucune annonce disponible.'));
                     } else {
                       List<NotificationModel> notificatinsList = List<NotificationModel>.from(snapshot.data!.map<NotificationModel>((item) => NotificationModel.fromJson(item)));
                       return ListView.builder(

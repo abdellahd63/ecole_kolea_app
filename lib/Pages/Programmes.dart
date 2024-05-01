@@ -19,18 +19,21 @@ class Programmes extends StatelessWidget {
   Widget build(BuildContext context) {
     TextEditingController textEditingController = TextEditingController();
     final selectionController = Get.put(SelectionController());
-    String? selectedSemester = '';
+    String anneeUniversitaire = '';
     return Scaffold(
-      body: FutureBuilder<dynamic>(
+      body: FutureBuilder<Map<String, dynamic>>(
         future: APIs.GetAllSemesters(context),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text('No data available.'));
           } else {
-            List<dynamic> semesterData = snapshot.data!;
-            selectionController.Semesteritems.value = semesterData.map<Semester>((item) => Semester.fromJson(item)).toList();
+            Map<String, dynamic> semesterData = snapshot.data!;
+            anneeUniversitaire = semesterData["anneeUniversitaire"][0]["id"].toString();
+            selectionController.Semesteritems.value = semesterData["semestres"].map<Semester>((item) => Semester.fromJson(item)).toList();
             return Column(
               children: [
                 SizedBox(height: 30,),
@@ -142,8 +145,8 @@ class Programmes extends StatelessWidget {
                           children: [
                             Expanded(
                                 child: InkWell(
-                                  onTap: () {
-                                    if(selectionController.SemestertextSelection.value.isEmpty){
+                                  onTap: () async{
+                                    if(selectionController.SemestertextSelection.value.isEmpty || anneeUniversitaire.isEmpty){
                                       showTopSnackBar(
                                         Overlay.of(context),
                                         CustomSnackBar.info(
@@ -151,14 +154,24 @@ class Programmes extends StatelessWidget {
                                         ),
                                       );
                                     }else{
-                                      String name = selectionController.Semesteritems.value
-                                          .where((item) => item.id.toString() == selectionController.SemestertextSelection.value)
-                                          .map((item) => item.libelle.toString()).first.toString();
-
-                                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => PlanningCours(
-                                        semesterID: selectionController.SemestertextSelection.value.toString(),
-                                        semester: name, // Assuming you want to get the first item from the filtered list
-                                      )));
+                                      Map<String, dynamic> data = await APIs.GetAllEmploiDuTemps(context, anneeUniversitaire, "1", selectionController.SemestertextSelection.value);
+                                      if(data != null){
+                                        String name = selectionController.Semesteritems.value
+                                            .where((item) => item.id.toString() == selectionController.SemestertextSelection.value)
+                                            .map((item) => item.libelle.toString()).first.toString();
+                                        Navigator.of(context).push(MaterialPageRoute(builder: (context) => PlanningCours(
+                                          semesterID: selectionController.SemestertextSelection.value.toString(),
+                                          semester: name,
+                                          emploiID: data["id"].toString()
+                                        )));
+                                      }else{
+                                        showTopSnackBar(
+                                          Overlay.of(context),
+                                          CustomSnackBar.info(
+                                            message: 'aucun emploi du temps n\'est disponible',
+                                          ),
+                                        );
+                                      }
                                     }
                                   },
                                   child: Padding(

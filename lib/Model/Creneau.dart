@@ -5,9 +5,11 @@ class Creneau{
   String horaire_fin;
   int module;
   int enseignant;
-  int groupe;
+  int? groupe;
   String libelle;
   int emploi_du_temps;
+  String? moduleName;
+  String? enseignantName;
 
   Creneau({
     required this.id,
@@ -18,7 +20,9 @@ class Creneau{
     required this.enseignant,
     required this.groupe,
     required this.libelle,
-    required this.emploi_du_temps
+    required this.emploi_du_temps,
+    this.moduleName,
+    this.enseignantName
   });
 
   factory Creneau.fromJson(Map<String, dynamic> json) {
@@ -32,6 +36,8 @@ class Creneau{
       groupe: json['groupe'],
       libelle: json['libelle'].toString(),
       emploi_du_temps: json['emploi_du_temps'],
+      moduleName: json['moduleName'].toString(),
+      enseignantName: json['enseignantName'],
     );
   }
 }

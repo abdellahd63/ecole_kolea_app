@@ -5,8 +5,6 @@ import 'package:ecole_kolea_app/Constantes/Colors.dart';
 import 'package:ecole_kolea_app/Model/ClasseChat.dart';
 import 'package:ecole_kolea_app/Model/Filiere.dart';
 import 'package:ecole_kolea_app/Model/Groupe.dart';
-import 'package:ecole_kolea_app/Model/Groupe.dart';
-import 'package:ecole_kolea_app/Model/Section.dart';
 import 'package:ecole_kolea_app/Model/Section.dart';
 import 'package:ecole_kolea_app/Model/User.dart';
 import 'package:ecole_kolea_app/Model/UserAdmin.dart';
@@ -316,7 +314,7 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                                'Section '+item.libelle.toString(),
+                                                item.libelle.toString(),
                                                 style: TextStyle(
                                                   fontSize: 14,
                                                 ),
@@ -416,7 +414,7 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              'Groupe '+item.libelle.toString(),
+                                              item.libelle.toString(),
                                               style: TextStyle(
                                                 fontSize: 14,
                                               ),

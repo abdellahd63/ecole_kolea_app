@@ -11,6 +11,8 @@ import 'package:ecole_kolea_app/Pages/Presence.dart';
 import 'package:ecole_kolea_app/Pages/Presentation.dart';
 import 'package:ecole_kolea_app/Pages/Profil.dart';
 import 'package:ecole_kolea_app/Pages/Programmes.dart';
+import 'package:ecole_kolea_app/controllers/LocalNotification.dart';
+import 'package:ecole_kolea_app/controllers/PasswordController.dart';
 import 'package:ecole_kolea_app/controllers/SelectionController.dart';
 import 'package:ecole_kolea_app/controllers/QRcodeController.dart';
 import 'package:ecole_kolea_app/controllers/Searching.dart';
@@ -38,15 +40,11 @@ class _ConnectedHomePage extends State<ConnectedHomePage> {
     });
   }
   void ClearControllers(){
-    final searching = Get.put(Searching());
-    final selectionController = Get.put(SelectionController());
-    final Qrcode = Get.put(QRcodeController());
-
-    searching.ClearAll();
-    selectionController.ClearAllItems();
-    selectionController.ClearAll();
-    selectionController.TimetextSelection.value = '';
-    Qrcode.Clear();
+    Get.delete<Searching>();
+    Get.delete<SelectionController>();
+    Get.delete<QRcodeController>();
+    Get.delete<LocalNotification>();
+    Get.delete<PasswordController>();
   }
   static  List<Widget> routes= [
     const Presentation(),

@@ -53,10 +53,14 @@ class APIs {
         preferences.setString("id", user["id"].toString());
         preferences.setString("token", user["token"].toString());
         preferences.setString("type", user["type"].toString());
+        if(user["type"].toString() == 'etudiant') {
+          preferences.setString("groupe", user["groupe"].toString());
+        }
 
         if (preferences.getString("id") != null &&
             preferences.getString("type") != null &&
-            preferences.getString("token") != null) {
+            preferences.getString("token") != null
+        ) {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => ConnectedHomePage()),
@@ -958,7 +962,7 @@ class APIs {
 
   //Semester
   //Get all semesters
-  static Future<List<dynamic>> GetAllSemesters(BuildContext context) async {
+  static Future<Map<String, dynamic>> GetAllSemesters(BuildContext context) async {
     try {
       final SharedPreferences preferences = await SharedPreferences.getInstance();
 
@@ -970,7 +974,7 @@ class APIs {
       );
 
       if (response.statusCode == 200) {
-        List<dynamic> responseData = json.decode(response.body);
+        Map<String, dynamic> responseData = json.decode(response.body);
         return responseData;
       } else {
         print('Error receiving semester data: ${response.body}');
@@ -985,6 +989,64 @@ class APIs {
       );
     }
     // Return an empty list in case of an error
+    return {};
+  }
+  static Future<Map<String, dynamic>> GetAllEmploiDuTemps(BuildContext context, String annee, String section, String semester) async {
+    try {
+      final SharedPreferences preferences = await SharedPreferences.getInstance();
+
+      final response = await http.get(
+        Uri.parse('${API_URL}/api/emploidutemps/${annee}/${section}/${semester}'),
+        headers: {'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${preferences.getString("token").toString()}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> responseData = json.decode(response.body);
+        return responseData;
+      } else {
+        print('Error receiving emploi du temps data: ${response.body}');
+      }
+    } catch (error) {
+      print('Error fetching emploi du temps data: $error');
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: 'vérifier votre internet',
+        ),
+      );
+    }
+    // Return an empty list in case of an error
+    return {};
+  }
+  static Future<List<dynamic>> GetAllCreneauByemploidutemps(BuildContext context, String id) async {
+    try {
+      final SharedPreferences preferences = await SharedPreferences.getInstance();
+
+      final response = await http.get(
+        Uri.parse('${API_URL}/api/creneau/emploidutemps/${id}/${preferences.getString("groupe").toString()}'),
+        headers: {'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${preferences.getString("token").toString()}',
+        },
+      );
+      if (response.statusCode == 200) {
+        List<dynamic> responseData = json.decode(response.body);
+        return responseData;
+      } else {
+        print('Error receiving Créneaus By emploidutemps data: ${response.body}');
+      }
+    } catch (error) {
+      print('Error fetching Créneaus By emploidutemps data: $error');
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: 'vérifier votre internet',
+        ),
+      );
+    }
+    // Return an empty list in case of an error
     return [];
   }
+
 }

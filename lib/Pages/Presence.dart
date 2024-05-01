@@ -53,7 +53,8 @@ class _PresenceState extends State<Presence> {
         selectionController.Groupeitems.value = F_S_G_ByIDEnseignantData["groupes"].map<Groupe>((item) => Groupe.fromJson(item)).toList();
         selectionController.Timeitems.value = CreneauByIDEnsegniantData.map<Creneau>((item) => Creneau.fromJson(item)).toList();
       });
-      print(selectionController.Timeitems.value);
+      // for(int i=0; i<selectionController.Timeitems.length; i++)
+      //   print(selectionController.Timeitems.value[i].groupe);
     }
   }
 

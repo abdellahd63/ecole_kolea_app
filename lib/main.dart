@@ -1,4 +1,6 @@
 
+import 'dart:io';
+
 import 'package:ecole_kolea_app/Constantes/Colors.dart';
 import 'package:ecole_kolea_app/Pages/ConnectedHomePage.dart';
 import 'package:ecole_kolea_app/Pages/DeconnectedHomepage.dart';
@@ -10,12 +12,19 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   final SharedPreferences preferences = await SharedPreferences.getInstance();
   await LocalNotification.init();
-  //final SocketController socketController = Get.put(SocketController());
+  HttpOverrides.global = new MyHttpOverrides();
   runApp(
       MyApp(token: preferences.getString("token"))
   );
@@ -23,8 +32,6 @@ void main() async{
 class MyApp extends StatelessWidget {
   final token;
   const MyApp({super.key, required this.token});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

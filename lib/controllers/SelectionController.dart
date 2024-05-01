@@ -28,6 +28,7 @@ class SelectionController extends GetxController {
     GroupetextSelection.value = '';
     SemestertextSelection.value = '';
     SemesterNametextSelection.value = '';
+    TimetextSelection.value = '';
   }
   void ClearAllItems(){
     Filiereitems.value.clear();

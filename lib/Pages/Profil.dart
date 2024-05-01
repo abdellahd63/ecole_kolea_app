@@ -32,9 +32,9 @@ class Profil extends StatelessWidget {
                 return Center(child: CircularProgressIndicator());
               } else if (snapshot.hasError) {
                 return Center(child: Text('Error: ${snapshot.error}'));
-              } else if (!snapshot.hasData || snapshot.data == null) {
+              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                 return Center(child: Text('No data available.'));
-              } else {
+              } else{
                 Map<String, dynamic> userData = snapshot.data;
                 return Center(
                   child: SingleChildScrollView(

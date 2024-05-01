@@ -50,7 +50,7 @@ class Categorie extends StatelessWidget {
                   } else if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}');
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Text('Aucune categorie disponible.');
+                    return Center(child: Text('Aucune categorie disponible.'));
                   } else {
                     List<CategorieModel> categorieData = List<CategorieModel>.from(snapshot.data!.map<CategorieModel>((item) => CategorieModel.fromJson(item)));
                     if(searching.CategorieSearchingtextController.text.isEmpty) {
