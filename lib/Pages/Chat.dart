@@ -170,7 +170,7 @@ class _ChatState extends State<Chat> {
     // Listen for reply message response from the server
     socket.onConnect((data) {
       socket.on("replyMessage", (msg) {
-        setMessage(msg["msg"], "destination", msg["path"]);
+        setMessage(msg["msg"], "destination", msg["path"] != null ? msg["path"] : '');
       });
     });
     // Request join room when the chat screen is opened if is a room
