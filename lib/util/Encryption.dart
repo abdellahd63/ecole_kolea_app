@@ -13,9 +13,14 @@ class Encryption{
   }
 
   static decryptAES(encryptedText) {
-    if (encryptedText.toString().isEmpty) return '';
-    final encrypter = Encrypter(AES(key));
-    final decrypted = encrypter.decrypt64(encryptedText, iv: iv);
-    return decrypted;
+    try{
+      if (encryptedText.toString().isEmpty || encryptedText.toString() == '-1') return '';
+      final encrypter = Encrypter(AES(key));
+      final decrypted = encrypter.decrypt64(encryptedText, iv: iv);
+      return decrypted;
+    }catch(err){
+      print('Error decrypting: $err');
+      return '';
+    }
   }
 }

@@ -5,10 +5,12 @@ import 'package:ecole_kolea_app/Model/Semester.dart';
 import 'package:ecole_kolea_app/Pages/PlanningCours.dart';
 import 'package:ecole_kolea_app/Pages/PlanningExam.dart';
 import 'package:ecole_kolea_app/controllers/SelectionController.dart';
+import 'package:ecole_kolea_app/controllers/SharedPreferencesController.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
@@ -19,6 +21,7 @@ class Programmes extends StatelessWidget {
   Widget build(BuildContext context) {
     TextEditingController textEditingController = TextEditingController();
     final selectionController = Get.put(SelectionController());
+    final sharedPreferencesController = Get.put(SharedPreferencesController());
     String anneeUniversitaire = '';
     return Scaffold(
       body: FutureBuilder<Map<String, dynamic>>(
@@ -32,7 +35,7 @@ class Programmes extends StatelessWidget {
             return Center(child: Text('No data available.'));
           } else {
             Map<String, dynamic> semesterData = snapshot.data!;
-            anneeUniversitaire = semesterData["anneeUniversitaire"][0]["id"].toString();
+            anneeUniversitaire = semesterData["anneeUniversitaire"]["id"].toString();
             selectionController.Semesteritems.value = semesterData["semestres"].map<Semester>((item) => Semester.fromJson(item)).toList();
             return Column(
               children: [
@@ -154,7 +157,8 @@ class Programmes extends StatelessWidget {
                                         ),
                                       );
                                     }else{
-                                      Map<String, dynamic> data = await APIs.GetAllEmploiDuTemps(context, anneeUniversitaire, "1", selectionController.SemestertextSelection.value);
+                                      String section = await sharedPreferencesController.getSection();
+                                      Map<String, dynamic> data = await APIs.GetAllEmploiDuTemps(context, anneeUniversitaire, section, selectionController.SemestertextSelection.value);
                                       if(data != null){
                                         String name = selectionController.Semesteritems.value
                                             .where((item) => item.id.toString() == selectionController.SemestertextSelection.value)
@@ -203,26 +207,33 @@ class Programmes extends StatelessWidget {
                             Expanded(
                                 child: InkWell(
                                   onTap: () {
-                                    if(selectionController.SemestertextSelection.value.isEmpty){
-                                      showTopSnackBar(
+                                    showTopSnackBar(
                                         Overlay.of(context),
                                         CustomSnackBar.info(
-                                          message: 'Vous devez sélectionner le semestre',
+                                          message: 'Coming soon',
                                         ),
-                                      );
-                                    }else {
-                                      String name = selectionController.Semesteritems.value
-                                          .where((item) => item.id.toString() == selectionController.SemestertextSelection.value)
-                                          .map((item) => item.libelle.toString()).first.toString();
-
-                                      Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  PlanningExam(
-                                                    semesterID: selectionController.SemestertextSelection.value.toString(),
-                                                    semester: name,
-                                                  )));
-                                    }},
+                                    );
+                                    // if(selectionController.SemestertextSelection.value.isEmpty){
+                                    //   showTopSnackBar(
+                                    //     Overlay.of(context),
+                                    //     CustomSnackBar.info(
+                                    //       message: 'Vous devez sélectionner le semestre',
+                                    //     ),
+                                    //   );
+                                    // }else {
+                                    //   String name = selectionController.Semesteritems.value
+                                    //       .where((item) => item.id.toString() == selectionController.SemestertextSelection.value)
+                                    //       .map((item) => item.libelle.toString()).first.toString();
+                                    //
+                                    //   Navigator.of(context).push(
+                                    //       MaterialPageRoute(
+                                    //           builder: (context) =>
+                                    //               PlanningExam(
+                                    //                 semesterID: selectionController.SemestertextSelection.value.toString(),
+                                    //                 semester: name,
+                                    //               )));
+                                    // }
+                                  },
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Container(

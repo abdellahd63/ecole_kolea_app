@@ -107,7 +107,7 @@ class _EvaluationState extends State<Evaluation> {
                             ),
                           ),
                         ),
-                        if(Semesters.length == 2)
+                        if(Semesters.length > 0)
                           Padding(
                             padding: EdgeInsets.symmetric(horizontal: 0,vertical: 10),
                             child: Row(
@@ -127,6 +127,7 @@ class _EvaluationState extends State<Evaluation> {
                                   ),
                                   child: Text('${Semesters[0].semestre}', style: TextStyle(color: currentSemesterTab == 0 ? MyAppColors.whitecolor: MyAppColors.principalcolor),),
                                 ),
+                                if(Semesters.length > 1)
                                 ElevatedButton(
                                   onPressed: () {
                                     changeSemesterTab(1);

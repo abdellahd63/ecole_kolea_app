@@ -66,3 +66,5 @@ flutter:
     - lib/Assets/Images/planexams.png
     - lib/Assets/Images/noprofilpic.png
     - lib/Assets/Images/noInternet.png
+    - lib/animations/info.json
+    - lib/animations/success.json

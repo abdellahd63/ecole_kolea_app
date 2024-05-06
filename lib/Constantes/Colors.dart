@@ -10,5 +10,6 @@ class MyAppColors {
   static var gray400=Colors.grey[400];
   static var gray100=Colors.grey[200];
   static var red=Colors.red;
+  static var green = Color(0xFF28962F);
 
 }

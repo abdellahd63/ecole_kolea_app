@@ -53,8 +53,6 @@ class _PresenceState extends State<Presence> {
         selectionController.Groupeitems.value = F_S_G_ByIDEnseignantData["groupes"].map<Groupe>((item) => Groupe.fromJson(item)).toList();
         selectionController.Timeitems.value = CreneauByIDEnsegniantData.map<Creneau>((item) => Creneau.fromJson(item)).toList();
       });
-      // for(int i=0; i<selectionController.Timeitems.length; i++)
-      //   print(selectionController.Timeitems.value[i].groupe);
     }
   }
 
@@ -63,19 +61,19 @@ class _PresenceState extends State<Presence> {
       if(QRCODEController.QrCodeData.value.isEmpty){
         timer.cancel();
       }else{
+        //to refrech Qr code
         String holder = QRCODEController.QrCodeData.value;
         QRCODEController.QrCodeData.value = '';
         QRCODEController.QrCodeData.value = holder;
-        String endTime = selectionController.TimetextSelection.value.split("/")[1].toString();
+
+        //tracking end date of current creneau to make it red if the creneau ends
+        String endTime = selectionController.TimetextSelection.value.split("/").last.toString();
         List<String> parts = endTime.split(':');
         int hour = int.parse(parts[0]);
         int minute = int.parse(parts[1]);
         int second = int.parse(parts[2]);
         DateTime endDateTime = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, hour, minute, second);
-        print(DateTime.now());
-        print(endDateTime);
         isPastEndTime = DateTime.now().isAfter(endDateTime);
-        print(isPastEndTime);
       }
     });
   }
@@ -618,6 +616,7 @@ class _PresenceState extends State<Presence> {
                                                                 );
                                                               },
                                                             );
+
                                                             QRCODEController.QrCodeData.value = await APIs.GetCreneau(context,
                                                                 selectionController.TimetextSelection.value.split('/')[0].toString(),
                                                                 selectionController.GroupetextSelection.value.toString()
@@ -700,18 +699,18 @@ class _PresenceState extends State<Presence> {
                                           ),
                                         ),
                                       ),
-                                      Row(
+                                        Row(
                                         mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           Text(
-                                            selectionController.TimetextSelection.value.split("/")[0].toString(),
+                                            selectionController.TimetextSelection.value.split("/").first.toString(),
                                             style: TextStyle(
                                               color: isPastEndTime ? Colors.red : Colors.green,
                                             ),
                                           ),
                                           SizedBox(width: 40),
                                           Text(
-                                            selectionController.TimetextSelection.value.split("/")[1].toString(),
+                                            selectionController.TimetextSelection.value.split("/").last.toString(),
                                             style: TextStyle(
                                               color: isPastEndTime ? Colors.red : Colors.green,
                                             ),
@@ -799,53 +798,56 @@ class _PresenceState extends State<Presence> {
             setState(() {
               qrstr = Encryption.decryptAES(value);
             });
-            if (qrstr.isNotEmpty) {
+            if (qrstr.isNotEmpty && qrstr.split('#').length == 2) {
               var data = qrstr.split('#');
-              if(data.length == 2){
-                // Parse the date from the qrstr
-                DateTime qrDate = DateTime.parse(data[0]);
+              // Parse the date from the qrstr
+              DateTime qrDate = DateTime.parse(data[0]);
+              DateTime currentDate = DateTime.now();
 
-                // Get the current date without the time
-                DateTime currentDate = DateTime.now();
+              // Calculate the difference
+              Duration difference = qrDate.difference(currentDate);
 
-                // Calculate the difference in seconds
-                Duration difference = qrDate.difference(currentDate);
+              // print('====================================');
+              // print(qrDate);
+              // print(currentDate);
+              // print(difference.inSeconds.abs() > -1 &&
+              //     difference.inSeconds.abs() <= 20);
+              // print(difference.inSeconds.abs());
+              // print('====================================');
 
-                // print('====================================');
-                // print(qrDate);
-                // print(currentDate);
-                // print(difference.inSeconds.abs() > -1 &&
-                //     difference.inSeconds.abs() <= 20);
-                // print(difference.inSeconds.abs());
-                // print('====================================');
-
-                // Compare the date parts
-                if ((difference.inSeconds.abs() > -1 &&
-                    difference.inSeconds.abs() <= 20) &&
-                    data[1].toString().isNotEmpty
-                ) {
-                  await APIs.PostPresence(context, data[1]);
-                }else{
-                  showTopSnackBar(
-                    Overlay.of(context),
-                    CustomSnackBar.error(
-                      message: 'QR Code non valide',
-                    ),
-                  );
-                }
+              // Compare the date parts
+              if ((difference.inSeconds.abs() > -1
+                      && difference.inSeconds.abs() <= 40)
+                  &&
+                  data[1].toString().isNotEmpty
+              ) {
+                await APIs.PostPresence(context, data[1]);
               }else{
                 showTopSnackBar(
                   Overlay.of(context),
                   CustomSnackBar.error(
-                    message: 'QR Code non valideeee',
+                    message: 'Veuillez scanner le QR code à nouveau',
                   ),
                 );
               }
+            }else{
+              showTopSnackBar(
+                Overlay.of(context),
+                CustomSnackBar.error(
+                  message: 'QR Code non valide',
+                ),
+              );
             }
           }
       );
     } catch (e) {
-      qrstr = "essayer à nouveau";
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.info(
+          message: 'Essayer à nouveau',
+        ),
+      );
+      qrstr = "";
     }
   }
 }

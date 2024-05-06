@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 
 class SelectionController extends GetxController {
+
   //Filiere
   var FilieretextSelection = ''.obs;
   var Filiereitems = [].obs;
@@ -28,7 +29,6 @@ class SelectionController extends GetxController {
     GroupetextSelection.value = '';
     SemestertextSelection.value = '';
     SemesterNametextSelection.value = '';
-    TimetextSelection.value = '';
   }
   void ClearAllItems(){
     Filiereitems.value.clear();

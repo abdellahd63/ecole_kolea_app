@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:ecole_kolea_app/Constant.dart';
 import 'package:ecole_kolea_app/Pages/ConnectedHomePage.dart';
+import 'package:ecole_kolea_app/Pages/Success.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -55,6 +56,7 @@ class APIs {
         preferences.setString("type", user["type"].toString());
         if(user["type"].toString() == 'etudiant') {
           preferences.setString("groupe", user["groupe"].toString());
+          preferences.setString("section", user["section"].toString());
         }
 
         if (preferences.getString("id") != null &&
@@ -900,13 +902,12 @@ class APIs {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        showTopSnackBar(
-          Overlay.of(context),
-          CustomSnackBar.success(
-            message: data['message'].toString(),
+        Navigator.of(context).push(
+          new MaterialPageRoute(
+              builder: (_)=>new Success(message: data['message'].toString())
           ),
-        );
-      } else {
+        ).then((val)=>null);
+      } else if(response.statusCode == 400){
         final data = json.decode(response.body);
         showTopSnackBar(
           Overlay.of(context),

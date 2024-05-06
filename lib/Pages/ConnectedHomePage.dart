@@ -16,6 +16,7 @@ import 'package:ecole_kolea_app/controllers/PasswordController.dart';
 import 'package:ecole_kolea_app/controllers/SelectionController.dart';
 import 'package:ecole_kolea_app/controllers/QRcodeController.dart';
 import 'package:ecole_kolea_app/controllers/Searching.dart';
+import 'package:ecole_kolea_app/controllers/SharedPreferencesController.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -45,6 +46,7 @@ class _ConnectedHomePage extends State<ConnectedHomePage> {
     Get.delete<QRcodeController>();
     Get.delete<LocalNotification>();
     Get.delete<PasswordController>();
+    Get.delete<SharedPreferencesController>();
   }
   static  List<Widget> routes= [
     const Presentation(),
