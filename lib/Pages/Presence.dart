@@ -57,7 +57,7 @@ class _PresenceState extends State<Presence> {
   }
 
   void Timerleft(){
-    Timer.periodic(Duration(seconds: 20), (timer) {
+    Timer.periodic(Duration(seconds: 5), (timer) {
       if(QRCODEController.QrCodeData.value.isEmpty){
         timer.cancel();
       }else{
