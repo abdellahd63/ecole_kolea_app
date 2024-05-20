@@ -41,10 +41,19 @@ dependencies:
   flutter_bcrypt: ^1.0.8
   encrypt: ^5.0.3
   url_launcher: ^6.2.4
+  flutter_launcher_icons: ^0.13.1
+  change_app_package_name: ^1.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/playstore.png"
+
+
 
   
 
@@ -59,6 +68,7 @@ flutter:
     - lib/Assets/Images/logoHSMDE.png
     - lib/Assets/Images/logo.png
     - lib/Assets/Images/Frame1.png
+    - lib/Assets/Images/Frame1.jpeg
     - lib/Assets/Images/Frame2.png
     - lib/Assets/Images/Frame3.png
     - lib/Assets/Images/profilpic.jpg

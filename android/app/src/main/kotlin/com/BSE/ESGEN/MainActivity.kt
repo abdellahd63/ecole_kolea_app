@@ -1,4 +1,4 @@
-package com.example.ecole_kolea_app
+package com.BSE.ESGEN
 
 import io.flutter.embedding.android.FlutterActivity
 
