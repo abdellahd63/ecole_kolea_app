@@ -31,6 +31,7 @@ class _ChatState extends State<Chat> {
   bool sendButton = false;
   String mysourceID = "";
   String mysourceType = "";
+  String mysourceFullname = "";
   List<Message> messages=[];
   ImagePicker imagePicker = ImagePicker();
   XFile? file;
@@ -63,8 +64,8 @@ class _ChatState extends State<Chat> {
       "class": '',
     });
   }
-  void sendRoomMessage(String msg, String targetID, String path){
-    setMessage(msg, mysourceType, path);
+  void sendRoomMessage(String msg, String targetID){
+    setMessage(msg, mysourceType, mysourceFullname);
     socket.emit("message", {
       "msg" : msg,
       "sourceID": mysourceID,
@@ -72,8 +73,8 @@ class _ChatState extends State<Chat> {
       "date": DateTime.now().toString(),
       "sujet": '',
       "source": mysourceType,
-      "path": path,
       "type": 'class',
+      "expediteurName": mysourceFullname
     });
     socket.emit('notification', {
       "msg" : msg,
@@ -82,17 +83,16 @@ class _ChatState extends State<Chat> {
       "date": DateTime.now().toString(),
       "sujet": '',
       "source": mysourceType,
-      "path": path,
       "type": 'class',
       "class": '',
     });
   }
-  void setMessage(String msg, String type, String path){
+  void setMessage(String msg, String type, String fullname){
     Message message = Message(
         text: msg,
         date: DateTime.now(),
         type: type,
-        path: path != null ? path.toString() : ""
+        fullname: fullname
     );
     if(mounted) {
       setState(() {
@@ -135,6 +135,7 @@ class _ChatState extends State<Chat> {
     setState(() {
       mysourceID = preferences.getString("id").toString();
       mysourceType = preferences.getString("type").toString();
+      mysourceFullname = preferences.getString("fullname").toString();
     });
     socket = IO.io(Constant.URL, <String,dynamic>{
       "transports":["websocket"],
@@ -170,7 +171,7 @@ class _ChatState extends State<Chat> {
     // Listen for reply message response from the server
     socket.onConnect((data) {
       socket.on("replyMessage", (msg) {
-        setMessage(msg["msg"], "destination", msg["path"] != null ? msg["path"] : '');
+        setMessage(msg["msg"], "destination", msg["expediteurName"]);
       });
     });
     // Request join room when the chat screen is opened if is a room
@@ -257,14 +258,7 @@ class _ChatState extends State<Chat> {
                                 : (message.type == mysourceType))
                                 ? Alignment.centerRight
                                 : Alignment.centerLeft,
-                            child: message.path.isNotEmpty
-                                ? MessageFileCard(
-                              type: message.expediteurID != null
-                                  ? (message.expediteurID == mysourceID)
-                                  : (message.type == mysourceType),
-                              path: message.path,
-                            )
-                                : SendedMessageCard(
+                            child: SendedMessageCard(
                               text: message.text ?? '',
                               time: message.date.toString().substring(10, 16),
                               type: message.expediteurID != null
@@ -348,12 +342,11 @@ class _ChatState extends State<Chat> {
                             sendRoomMessage(
                               messagecontroller.text,
                               widget.target["id"],
-                              "",
                             ) :
                             sendMessage(
                               messagecontroller.text,
                               widget.target["id"],
-                              "",
+                              mysourceFullname,
                             );
                             messagecontroller.clear();
                             setState(() {
@@ -407,12 +400,11 @@ class _ChatState extends State<Chat> {
                               sendRoomMessage(
                                 messagecontroller.text,
                                 widget.target["id"],
-                                "",
                               ) :
                               sendMessage(
                                 messagecontroller.text,
                                 widget.target["id"],
-                                "",
+                                mysourceFullname,
                               );
                               messagecontroller.clear();
                               setState(() {

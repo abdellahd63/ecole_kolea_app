@@ -54,6 +54,9 @@ class APIs {
         preferences.setString("id", user["id"].toString());
         preferences.setString("token", user["token"].toString());
         preferences.setString("type", user["type"].toString());
+        if(user["type"].toString() == 'etudiant' || user["type"].toString() == 'enseignant') {
+          preferences.setString("fullname", user["fullname"].toString());
+        }
         if(user["type"].toString() == 'etudiant') {
           preferences.setString("groupe", user["groupe"].toString());
           preferences.setString("section", user["section"].toString());

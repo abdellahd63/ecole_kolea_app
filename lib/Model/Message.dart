@@ -3,14 +3,14 @@ class Message {
   String? text;
   DateTime date;
   String type;
-  String path;
+  String? path;
   String? fullname;
 
   Message({
     this.text,
     required this.date,
     required this.type,
-    required this.path,
+    this.path,
     this.expediteurID,
     this.fullname
   });
