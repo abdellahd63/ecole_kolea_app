@@ -4,11 +4,7 @@ import 'dart:io';
 import 'package:ecole_kolea_app/Constantes/Colors.dart';
 import 'package:ecole_kolea_app/Pages/ConnectedHomePage.dart';
 import 'package:ecole_kolea_app/Pages/DeconnectedHomepage.dart';
-import 'package:ecole_kolea_app/controllers/LocalNotification.dart';
-import 'package:ecole_kolea_app/controllers/Searching.dart';
-import 'package:ecole_kolea_app/controllers/SocketController.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,7 +19,6 @@ class MyHttpOverrides extends HttpOverrides {
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   final SharedPreferences preferences = await SharedPreferences.getInstance();
-  await LocalNotification.init();
   HttpOverrides.global = new MyHttpOverrides();
   runApp(
       MyApp(token: preferences.getString("token"))

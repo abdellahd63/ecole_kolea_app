@@ -1,18 +1,16 @@
 class Message {
   String? expediteurID;
-  String? text;
+  String text;
   DateTime date;
   String type;
-  String? path;
-  String? fullname;
+  String? expediteurName;
 
   Message({
-    this.text,
+    required this.text,
     required this.date,
     required this.type,
-    this.path,
     this.expediteurID,
-    this.fullname
+    this.expediteurName
   });
 
   factory Message.fromJson(Map<String, dynamic> json) {
@@ -20,9 +18,8 @@ class Message {
       text: json['texte'],
       date: DateTime.parse(json['date_envoi']),
       type: json['expediteur'],
-      path: '',
       expediteurID: json['expediteurID'],
-      fullname: json['expediteurName']
+        expediteurName: json['expediteurName']
     );
   }
 }
