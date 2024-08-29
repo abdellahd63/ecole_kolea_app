@@ -1,6 +1,7 @@
 
 import 'package:ecole_kolea_app/Constantes/Colors.dart';
 import 'package:ecole_kolea_app/Pages/Bibiotheque.dart';
+import 'package:ecole_kolea_app/Pages/ConnectedPresentation.dart';
 import 'package:ecole_kolea_app/Pages/Contact.dart';
 import 'package:ecole_kolea_app/Pages/DeconnectedHomepage.dart';
 import 'package:ecole_kolea_app/Pages/Doleance.dart';
@@ -11,7 +12,6 @@ import 'package:ecole_kolea_app/Pages/Presence.dart';
 import 'package:ecole_kolea_app/Pages/Presentation.dart';
 import 'package:ecole_kolea_app/Pages/Profil.dart';
 import 'package:ecole_kolea_app/Pages/Programmes.dart';
-import 'package:ecole_kolea_app/controllers/LocalNotification.dart';
 import 'package:ecole_kolea_app/controllers/PasswordController.dart';
 import 'package:ecole_kolea_app/controllers/SelectionController.dart';
 import 'package:ecole_kolea_app/controllers/QRcodeController.dart';
@@ -32,7 +32,7 @@ class ConnectedHomePage extends StatefulWidget {
 class _ConnectedHomePage extends State<ConnectedHomePage> {
   String mysourceID = "";
   static String mysourceType = "";
-  int _selectedIndex=0;
+  
   void fetchInitData() async{
     final SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
@@ -44,12 +44,27 @@ class _ConnectedHomePage extends State<ConnectedHomePage> {
     Get.delete<Searching>();
     Get.delete<SelectionController>();
     Get.delete<QRcodeController>();
-    Get.delete<LocalNotification>();
     Get.delete<PasswordController>();
     Get.delete<SharedPreferencesController>();
   }
-  static  List<Widget> routes= [
-    const Presentation(),
+
+  int _selectedIndex=0;
+
+  late List<Widget> routes;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchInitData();
+    
+    routes = [
+    Connectedpresentation(
+      onPlanningButtonPressed: ()=>_onitemtapped(4),
+      onevaluationButtonPressed:()=>_onitemtapped(5),
+      onnotificationButtonPressed: ()=>_onitemtapped(6),
+      onpresenceButtonPressed: ()=>_onitemtapped(8),
+
+    ),
     const Filiere() ,
     Bibiotheque(),
     const Profil(),
@@ -59,7 +74,13 @@ class _ConnectedHomePage extends State<ConnectedHomePage> {
     Doleance(),
     Presence(),
     const Contact()
-  ];
+    ];
+
+    
+  }
+
+  
+
 
   void _onitemtapped(int index){
     setState(() {
@@ -67,10 +88,7 @@ class _ConnectedHomePage extends State<ConnectedHomePage> {
     });
   }
 
-  @override
-  void initState() {
-    fetchInitData();
-  }
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -288,7 +306,7 @@ class _ConnectedHomePage extends State<ConnectedHomePage> {
         ]),
       ),
       body: Center(
-        child: routes[_selectedIndex],
+        child: routes[_selectedIndex] ,
        ),
     );
   }

@@ -24,6 +24,7 @@ class Programmes extends StatelessWidget {
     final sharedPreferencesController = Get.put(SharedPreferencesController());
     String anneeUniversitaire = '';
     return Scaffold(
+      backgroundColor: MyAppColors.whitecolor,
       body: FutureBuilder<Map<String, dynamic>>(
         future: APIs.GetAllSemesters(context),
         builder: (context, snapshot) {
@@ -189,7 +190,7 @@ class Programmes extends StatelessWidget {
                                       child: Column(
                                         mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
-                                          Image.asset('lib/Assets/Images/plancours.png'),
+                                          Container(height: 70,child: Image.asset('lib/Assets/Images/plancours.png')),
                                           SizedBox(height: 10,),
                                           Text('Planning cours',
                                             style: TextStyle(

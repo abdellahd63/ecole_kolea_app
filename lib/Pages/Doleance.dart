@@ -399,7 +399,7 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
                                 child: DropdownButton2<String>(
                                   isExpanded: true,
                                   hint: Text(
-                                    'sélectionner la groupe',
+                                    'sélectionner un groupe',
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: Theme.of(context).hintColor,
@@ -745,7 +745,7 @@ class _DoleanceState extends State<Doleance> with TickerProviderStateMixin{
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Users',
+                        'Utilisateurs',
                         style: TextStyle(
                             color: MyAppColors.gray400,
                             fontSize: 12

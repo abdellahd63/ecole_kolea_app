@@ -4,9 +4,7 @@ import 'dart:io';
 import 'package:ecole_kolea_app/Constantes/Colors.dart';
 import 'package:ecole_kolea_app/Pages/ConnectedHomePage.dart';
 import 'package:ecole_kolea_app/Pages/DeconnectedHomepage.dart';
-import 'package:ecole_kolea_app/controllers/LocalNotification.dart';
 import 'package:ecole_kolea_app/controllers/Searching.dart';
-import 'package:ecole_kolea_app/controllers/SocketController.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -23,7 +21,6 @@ class MyHttpOverrides extends HttpOverrides {
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   final SharedPreferences preferences = await SharedPreferences.getInstance();
-  await LocalNotification.init();
   HttpOverrides.global = new MyHttpOverrides();
   runApp(
       MyApp(token: preferences.getString("token"))
@@ -34,15 +31,19 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key, required this.token});
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Ecole De Kolea',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: MyAppColors.principalcolor),
-        useMaterial3: true,
-        textTheme: GoogleFonts.poppinsTextTheme(),
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0), 
+      child: MaterialApp(
+       
+        title: 'Ecole De Kolea',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: MyAppColors.principalcolor),
+          useMaterial3: true,
+          textTheme: GoogleFonts.poppinsTextTheme(),
+        ),
+        debugShowCheckedModeBanner: false,
+        home: (token != null && JwtDecoder.isExpired(token) == false) ? ConnectedHomePage() : DeconnectedHomePage(),
       ),
-      debugShowCheckedModeBanner: false,
-      home: (token != null && JwtDecoder.isExpired(token) == false) ? ConnectedHomePage() : DeconnectedHomePage(),
     );
   }
 }

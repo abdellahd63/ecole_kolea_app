@@ -28,7 +28,7 @@ class ClasseChat{
       filiereName: json['filiereName'].toString(),
       groupeName: json['groupeName'].toString(),
       sectionName: json['sectionName'].toString(),
-      type: 'classe',
+      type: 'OnetoMany',
     );
   }
 }

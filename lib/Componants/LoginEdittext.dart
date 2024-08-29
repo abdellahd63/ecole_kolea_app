@@ -42,7 +42,7 @@ class LoginEdittext extends StatelessWidget {
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(30),
               ),
-              fillColor: Colors.grey[300],
+              fillColor: MyAppColors.whitecolor,
               filled: true,
               hintText: hint,
               prefixIcon: Icon(icon),

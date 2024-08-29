@@ -57,7 +57,7 @@ class _PresenceState extends State<Presence> {
   }
 
   void Timerleft(){
-    Timer.periodic(Duration(seconds: 20), (timer) {
+    Timer.periodic(Duration(seconds:5), (timer) {
       if(QRCODEController.QrCodeData.value.isEmpty){
         timer.cancel();
       }else{
@@ -745,39 +745,41 @@ class _PresenceState extends State<Presence> {
                   children: [
                       Column(
                         children: [
-                          Text("Scanner ce QR code pour justifier votre présence",
-                            textAlign: TextAlign.center,
-                            softWrap: true,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: MyAppColors.principalcolor,
-                              fontSize: 20,
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 20),
+                            child: Text("Pour confirmer votre présence, scannez le QR code affiché sur le téléphone de votre enseignant",
+                              textAlign: TextAlign.center,
+                              softWrap: true,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                color: MyAppColors.principalcolor,
+                                fontSize: 20,
+                              ),
                             ),
                           ),
+                          
                           Padding(
-                            padding: const EdgeInsets.symmetric(vertical:10.0),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Text("Appuyer pour scanner",
-                                    textAlign: TextAlign.center,
-                                    softWrap: true,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.grey[700],
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical:25.0),
+                            padding: const EdgeInsets.symmetric(vertical:25.0, horizontal: 20),
                             child: InkWell(
                               child: Container(
+                                padding: EdgeInsets.symmetric(vertical: 10),
                                   decoration: BoxDecoration(color: MyAppColors.dimopacityvblue, borderRadius: BorderRadius.circular(20)),
-                                  child: Icon(Icons.qr_code_scanner, size: 250,)),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text("Appuyer pour scanner",
+                                        textAlign: TextAlign.center,
+                                        softWrap: true,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.grey[700],
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      SizedBox(width: 20,),
+                                      Icon(Icons.qr_code_scanner, size: 50,),
+                                    ],
+                                  )),
                               onTap: (){
                                 scanQr();
                               },

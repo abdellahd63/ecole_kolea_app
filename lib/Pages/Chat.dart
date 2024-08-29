@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:ecole_kolea_app/APIs.dart';
-import 'package:ecole_kolea_app/Componants/MessageFileCard.dart';
 import 'package:ecole_kolea_app/Componants/SendedMessageCard.dart';
 import 'package:ecole_kolea_app/Constant.dart';
 import 'package:ecole_kolea_app/Constantes/Colors.dart';
@@ -13,8 +12,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
-import 'package:top_snackbar_flutter/custom_snack_bar.dart';
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
+
 
 class Chat extends StatefulWidget {
   Chat({super.key, required this.target, required this.Title});
@@ -31,68 +29,66 @@ class _ChatState extends State<Chat> {
   bool sendButton = false;
   String mysourceID = "";
   String mysourceType = "";
+  String mysourceFullname = "";
   List<Message> messages=[];
   ImagePicker imagePicker = ImagePicker();
   XFile? file;
   bool loading = true;
 
-  void sendMessage(String msg, String targetID, String path){
-    setMessage(msg, mysourceType, path);
+  void sendMessage(String msg, String targetID){
+    setMessage(msg, mysourceType, mysourceFullname);
     socket.emit("message", {
       "msg" : msg,
+      "expediteurName" : mysourceFullname,
       "sourceID": mysourceID,
+      "sourceType": mysourceType,
       "targetID": targetID,
       "targetType": widget.target["type"],
       "date": DateTime.now().toString(),
       "sujet": '',
-      "source": mysourceType,
-      "path": path,
-      "type": mysourceType + widget.target["type"],
-      "class": '',
     });
-    socket.emit('notification', {
+    // socket.emit('notification', {
+    //   "msg" : msg,
+    //   "sourceID": mysourceID,
+    //   "targetID": targetID,
+    //   "targetType": widget.target["type"],
+    //   "date": DateTime.now().toString(),
+    //   "sujet": '',
+    //   "source": mysourceType,
+    //   "path": path,
+    //   "type": mysourceType + widget.target["type"],
+    //   "class": '',
+    // });
+  }
+  void sendRoomMessage(String msg, String targetID){
+    setMessage(msg, mysourceType, mysourceFullname);
+    socket.emit("message", {
       "msg" : msg,
+      "expediteurName": mysourceFullname,
       "sourceID": mysourceID,
-      "targetID": targetID,
+      "sourceType": mysourceType,
+      "targetID": widget.target["id"],
       "targetType": widget.target["type"],
       "date": DateTime.now().toString(),
       "sujet": '',
-      "source": mysourceType,
-      "path": path,
-      "type": mysourceType + widget.target["type"],
-      "class": '',
     });
+    // socket.emit('notification', {
+    //   "msg" : msg,
+    //   "sourceID": mysourceID,
+    //   "targetID": widget.target["id"],
+    //   "date": DateTime.now().toString(),
+    //   "sujet": '',
+    //   "source": mysourceType,
+    //   "type": 'class',
+    //   "class": '',
+    // });
   }
-  void sendRoomMessage(String msg, String targetID, String path){
-    setMessage(msg, mysourceType, path);
-    socket.emit("message", {
-      "msg" : msg,
-      "sourceID": mysourceID,
-      "targetID": widget.target["id"],
-      "date": DateTime.now().toString(),
-      "sujet": '',
-      "source": mysourceType,
-      "path": path,
-      "type": 'class',
-    });
-    socket.emit('notification', {
-      "msg" : msg,
-      "sourceID": mysourceID,
-      "targetID": widget.target["id"],
-      "date": DateTime.now().toString(),
-      "sujet": '',
-      "source": mysourceType,
-      "path": path,
-      "type": 'class',
-      "class": '',
-    });
-  }
-  void setMessage(String msg, String type, String path){
+  void setMessage(String msg, String type, String fullname){
     Message message = Message(
         text: msg,
         date: DateTime.now(),
         type: type,
-        path: path != null ? path.toString() : ""
+        expediteurName: fullname
     );
     if(mounted) {
       setState(() {
@@ -105,41 +101,22 @@ class _ChatState extends State<Chat> {
       curve: Curves.easeInOut,
     );
   }
-  Future<void> sendIMG(File file) async {
-    Message message = Message(
-        date: DateTime.now(),
-        type: mysourceType,
-        path: file.path
-    );
-    if(mounted) {
-      setState(() {
-        messages.insert(0,message);
-      });
-    }
-    String serverPath = await APIs.uploadMyFile(context, file);
-    socket.emit("message", {
-      "msg" : '',
-      "sourceID": mysourceID,
-      "targetID": widget.target["id"],
-      "targetType": widget.target["type"],
-      "date": DateTime.now().toString(),
-      "sujet": '',
-      "source": mysourceType,
-      "path": serverPath,
-      "type": mysourceType + widget.target["type"],
-      "class": '',
-    });
-  }
   Future<void> connecte() async {
     final SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
       mysourceID = preferences.getString("id").toString();
       mysourceType = preferences.getString("type").toString();
+      mysourceFullname = preferences.getString("fullname").toString();
     });
+    // Retrieve the token from SharedPreferences
+    final String? token = preferences.getString("token");
     socket = IO.io(Constant.URL, <String,dynamic>{
       "transports":["websocket"],
       "autoConnect": false,
       'force new connection': true,
+      "extraHeaders": {
+        "Authorization": "Bearer $token", // Add the token to the headers
+      },
     });
     socket.connect();
     socket.on("connect_error", (err) {
@@ -150,10 +127,9 @@ class _ChatState extends State<Chat> {
     // Request chat history when the chat screen is opened
     socket.emit('getChatHistory', {
       "sourceID" : mysourceID,
+      "sourceType" : mysourceType,
       "targetID" : widget.target["id"],
       "targetType": widget.target["type"],
-      "type" : mysourceType + widget.target["type"],
-      "source" : mysourceType,
     });
     // Listen for chat history response from the server
     socket.on('chatHistory', (chatHistory) {
@@ -170,11 +146,11 @@ class _ChatState extends State<Chat> {
     // Listen for reply message response from the server
     socket.onConnect((data) {
       socket.on("replyMessage", (msg) {
-        setMessage(msg["msg"], "destination", msg["path"] != null ? msg["path"] : '');
+        setMessage(msg["msg"], "destination", msg["expediteurName"]);
       });
     });
     // Request join room when the chat screen is opened if is a room
-    if(widget.target["type"] == 'classe'){
+    if(widget.target["type"] == 'OnetoMany'){
       socket.emit('joinRoom', widget.target["id"]);
     }
   }
@@ -257,20 +233,13 @@ class _ChatState extends State<Chat> {
                                 : (message.type == mysourceType))
                                 ? Alignment.centerRight
                                 : Alignment.centerLeft,
-                            child: message.path.isNotEmpty
-                                ? MessageFileCard(
-                              type: message.expediteurID != null
-                                  ? (message.expediteurID == mysourceID)
-                                  : (message.type == mysourceType),
-                              path: message.path,
-                            )
-                                : SendedMessageCard(
+                            child: SendedMessageCard(
                               text: message.text ?? '',
                               time: message.date.toString().substring(10, 16),
                               type: message.expediteurID != null
                                   ? (message.expediteurID == mysourceID)
                                   : (message.type == mysourceType),
-                              fullname: message.fullname,
+                              fullname: message.expediteurName,
                             ),
                           ),
                         ],
@@ -344,16 +313,14 @@ class _ChatState extends State<Chat> {
                           // }
                         } else {
                           if (messagecontroller.text.isNotEmpty && sendButton) {
-                            widget.target["type"] == "classe" ?
+                            widget.target["type"] == "OnetoMany" ?
                             sendRoomMessage(
                               messagecontroller.text,
                               widget.target["id"],
-                              "",
                             ) :
                             sendMessage(
                               messagecontroller.text,
                               widget.target["id"],
-                              "",
                             );
                             messagecontroller.clear();
                             setState(() {
@@ -403,16 +370,14 @@ class _ChatState extends State<Chat> {
                             // }
                           } else {
                             if (messagecontroller.text.isNotEmpty && sendButton) {
-                              widget.target["type"] == "classe" ?
+                              widget.target["type"] == "OnetoMany" ?
                               sendRoomMessage(
                                 messagecontroller.text,
                                 widget.target["id"],
-                                "",
                               ) :
                               sendMessage(
                                 messagecontroller.text,
                                 widget.target["id"],
-                                "",
                               );
                               messagecontroller.clear();
                               setState(() {

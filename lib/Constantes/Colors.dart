@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 class MyAppColors {
   static var principalcolor=Color(0xff294D9D);
   static var whitecolor=Colors.white;
-  static var dimopacityvblue=Color.fromARGB(83, 150, 180, 255);
-  static var blue=Color.fromARGB(255, 150, 180, 255);
+  static var dimopacityvblue=Color(0xFFE6EEFF);
+  static var blue=Color(0XFFEAEEFF).withOpacity(0.82);
   static var darkblue=Color(0xff060E30);
   static var black=Color.fromARGB(255, 0, 0, 0);
   static var gray400=Colors.grey[400];

@@ -17,8 +17,25 @@ class DeconnectedHomePage extends StatefulWidget {
 class _DeconnectedHomePageState extends State<DeconnectedHomePage> {
 
   int _selectedIndex=0;
+  
 
-    static  List<Widget> routes=[ const Presentation(), const Filiere(),const Contact()];
+  late final List<Widget> routes;
+
+  @override
+  void initState() {
+    super.initState();
+
+    
+    routes = [
+      Presentation(
+        onProfileButtonPressed: () {
+          _onitemtapped(1); 
+        },
+      ),
+      const Filiere(),
+      const Contact(),
+    ];
+  }
 
     void _onitemtapped(int index){
       setState(() {
