@@ -4,9 +4,11 @@ import 'dart:io';
 import 'package:ecole_kolea_app/Constantes/Colors.dart';
 import 'package:ecole_kolea_app/Pages/ConnectedHomePage.dart';
 import 'package:ecole_kolea_app/Pages/DeconnectedHomepage.dart';
+<<<<<<< HEAD
 import 'package:ecole_kolea_app/controllers/Searching.dart';
+=======
+>>>>>>> bc73f06ed605b14b7062f91e29807fea7cb22fd4
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
