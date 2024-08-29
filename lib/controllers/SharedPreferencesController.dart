@@ -6,4 +6,8 @@ class SharedPreferencesController extends GetxController {
     final SharedPreferences preferences = await SharedPreferences.getInstance();
     return preferences.getString("section").toString();
   }
+  Future<String> getType() async {
+    final SharedPreferences preferences = await SharedPreferences.getInstance();
+    return preferences.getString("type").toString();
+  }
 }

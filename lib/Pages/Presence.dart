@@ -57,11 +57,7 @@ class _PresenceState extends State<Presence> {
   }
 
   void Timerleft(){
-<<<<<<< HEAD
-    Timer.periodic(Duration(seconds:5), (timer) {
-=======
     Timer.periodic(Duration(seconds: 5), (timer) {
->>>>>>> bc73f06ed605b14b7062f91e29807fea7cb22fd4
       if(QRCODEController.QrCodeData.value.isEmpty){
         timer.cancel();
       }else{
@@ -699,7 +695,7 @@ class _PresenceState extends State<Presence> {
                                         padding: const EdgeInsets.all(15.0),
                                         child: Text('Vous pouvez scanner maintenant',
                                           style: TextStyle(
-                                            color: isPastEndTime ? Colors.red : Colors.green,
+                                            color: isPastEndTime ? Colors.green : Colors.green,
                                           ),
                                         ),
                                       ),
@@ -709,14 +705,14 @@ class _PresenceState extends State<Presence> {
                                           Text(
                                             selectionController.TimetextSelection.value.split("/").first.toString(),
                                             style: TextStyle(
-                                              color: isPastEndTime ? Colors.red : Colors.green,
+                                              color: isPastEndTime ? Colors.green : Colors.green,
                                             ),
                                           ),
                                           SizedBox(width: 40),
                                           Text(
                                             selectionController.TimetextSelection.value.split("/").last.toString(),
                                             style: TextStyle(
-                                              color: isPastEndTime ? Colors.red : Colors.green,
+                                              color: isPastEndTime ? Colors.green : Colors.green,
                                             ),
                                           ),
                                         ],
@@ -729,7 +725,7 @@ class _PresenceState extends State<Presence> {
                                     data: Encryption.encryptAES(QRCODEController.QrCodeData.value.isNotEmpty ? '${DateTime.now()}#${QRCODEController.QrCodeData.value}': ''),
                                     version: QrVersions.auto,
                                     size: 300.0,
-                                    foregroundColor: isPastEndTime ? Colors.red : Colors.black,
+                                    foregroundColor: isPastEndTime ? Colors.black : Colors.black,
                                   ),
                                 ),
                               ],
@@ -813,17 +809,17 @@ class _PresenceState extends State<Presence> {
               // Calculate the difference
               Duration difference = qrDate.difference(currentDate);
 
-              // print('====================================');
-              // print(qrDate);
-              // print(currentDate);
-              // print(difference.inSeconds.abs() > -1 &&
-              //     difference.inSeconds.abs() <= 20);
-              // print(difference.inSeconds.abs());
-              // print('====================================');
+              print('====================================');
+              print('qrDate : ${qrDate}');
+              print('currentDate : ${currentDate}');
+              print(difference.inSeconds.abs() > -1 &&
+                  difference.inSeconds.abs() <= 60);
+              print(difference.inSeconds.abs());
+              print('====================================');
 
               // Compare the date parts
               if ((difference.inSeconds.abs() > -1
-                      && difference.inSeconds.abs() <= 40)
+                      && difference.inSeconds.abs() <= 60)
                   &&
                   data[1].toString().isNotEmpty
               ) {

@@ -128,7 +128,6 @@ class _DeconnectedHomePageState extends State<DeconnectedHomePage> {
                     ),
               ),
               onTap: (){
-               
                Navigator.pop(context);
                Navigator.of(context).push(MaterialPageRoute(builder: (context)=>Login()));
               },  

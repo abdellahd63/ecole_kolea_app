@@ -1,7 +1,8 @@
 import 'package:ecole_kolea_app/Constantes/Colors.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class Connectedpresentation extends StatelessWidget {
+class Connectedpresentation extends StatefulWidget {
   final VoidCallback onPlanningButtonPressed;
   final VoidCallback onevaluationButtonPressed;
   final VoidCallback onnotificationButtonPressed;
@@ -15,6 +16,24 @@ class Connectedpresentation extends StatelessWidget {
    });
 
   @override
+  State<Connectedpresentation> createState() => _ConnectedpresentationState();
+}
+
+class _ConnectedpresentationState extends State<Connectedpresentation> {
+  String mysourceType = "";
+
+  void fetchInitData() async{
+    final SharedPreferences preferences = await SharedPreferences.getInstance();
+    setState(() {
+      mysourceType = preferences.getString("type").toString();
+    });
+  }
+  @override
+  void initState() {
+    super.initState();
+    fetchInitData();
+  }
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.white,
@@ -24,13 +43,13 @@ class Connectedpresentation extends StatelessWidget {
             children: [
                //logo
               Image.asset('lib/Assets/Images/logo.png'),
-              
+
               // bienvenu
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Bienvenue de retour étudiant ! \n Préparez-vous à atteindre vos objectifs.", 
+                  Text("Bienvenue de retour étudiant ! \n Préparez-vous à atteindre vos objectifs.",
                     textAlign: TextAlign.center,
                     softWrap: true,
                     maxLines: 5,
@@ -39,30 +58,30 @@ class Connectedpresentation extends StatelessWidget {
                       color: MyAppColors.black,
                       fontSize: 18,
                       overflow: TextOverflow.ellipsis,
-                      
+
                     ),
                   ),
                 ],
               ),
-
+              if(mysourceType == "etudiant" || mysourceType == "enseignant")
               SizedBox(height: 40,),
-
-              Padding(
+              if(mysourceType == "etudiant" || mysourceType == "enseignant")
+                Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: Row(
                   children: [
                     Expanded(
                       child: InkWell(
                         onTap: (){
-                          onPlanningButtonPressed();
+                          widget.onPlanningButtonPressed();
                         },
                         child: Container(
-                                      
+
                           height: 170,
                           decoration: BoxDecoration(
                             color: MyAppColors.dimopacityvblue,
                             borderRadius: BorderRadius.circular(20),
-                                      
+
                           ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -82,22 +101,20 @@ class Connectedpresentation extends StatelessWidget {
                         ),
                       )
                       ),
-                
-                      
+                    if(mysourceType == "etudiant")
                       SizedBox(width: 20,),
-
-
+                    if(mysourceType == "etudiant")
                       Expanded(
                       child: InkWell(
                         onTap: (){
-                          onevaluationButtonPressed();
+                          widget.onevaluationButtonPressed();
                         },
                         child: Container(
                           height: 170,
                           decoration: BoxDecoration(
                             color: MyAppColors.dimopacityvblue,
                             borderRadius: BorderRadius.circular(20),
-                                        
+
                           ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -117,14 +134,13 @@ class Connectedpresentation extends StatelessWidget {
                         ),
                       )
                       ),
-                    
+
                   ],
                 ),
               ),
-
-
-               SizedBox(height: 20,),
-
+              if(mysourceType == "etudiant")
+              SizedBox(height: 20,),
+              if(mysourceType == "etudiant")
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: Row(
@@ -132,15 +148,15 @@ class Connectedpresentation extends StatelessWidget {
                     Expanded(
                       child: InkWell(
                         onTap: (){
-                          onnotificationButtonPressed();
+                          widget.onnotificationButtonPressed();
                         },
                         child: Container(
-                                      
+
                           height: 170,
                           decoration: BoxDecoration(
                             color: MyAppColors.dimopacityvblue,
                             borderRadius: BorderRadius.circular(20),
-                                      
+
                           ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -162,22 +178,22 @@ class Connectedpresentation extends StatelessWidget {
                         ),
                       )
                       ),
-                
-                      
+
+
                       SizedBox(width: 20,),
 
 
                       Expanded(
                       child: InkWell(
                         onTap: (){
-                          onpresenceButtonPressed();
+                          widget.onpresenceButtonPressed();
                         },
                         child: Container(
                           height: 170,
                           decoration: BoxDecoration(
                             color: MyAppColors.dimopacityvblue,
                             borderRadius: BorderRadius.circular(20),
-                                        
+
                           ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -197,7 +213,7 @@ class Connectedpresentation extends StatelessWidget {
                         ),
                       )
                       ),
-                    
+
                   ],
                 ),
               ),

@@ -4,6 +4,7 @@ import 'package:ecole_kolea_app/Constantes/Colors.dart';
 import 'package:ecole_kolea_app/Model/Semester.dart';
 import 'package:ecole_kolea_app/Pages/PlanningCours.dart';
 import 'package:ecole_kolea_app/Pages/PlanningExam.dart';
+import 'package:ecole_kolea_app/Pages/TeacherPlanning.dart';
 import 'package:ecole_kolea_app/controllers/SelectionController.dart';
 import 'package:ecole_kolea_app/controllers/SharedPreferencesController.dart';
 import 'package:flutter/cupertino.dart';
@@ -150,32 +151,71 @@ class Programmes extends StatelessWidget {
                             Expanded(
                                 child: InkWell(
                                   onTap: () async{
-                                    if(selectionController.SemestertextSelection.value.isEmpty || anneeUniversitaire.isEmpty){
+                                    if (selectionController.SemestertextSelection.value.isEmpty || anneeUniversitaire.isEmpty) {
                                       showTopSnackBar(
                                         Overlay.of(context),
                                         CustomSnackBar.info(
                                           message: 'Vous devez sélectionner le semestre',
                                         ),
                                       );
-                                    }else{
+                                    } else {
                                       String section = await sharedPreferencesController.getSection();
-                                      Map<String, dynamic> data = await APIs.GetAllEmploiDuTemps(context, anneeUniversitaire, section, selectionController.SemestertextSelection.value);
-                                      if(data != null){
-                                        String name = selectionController.Semesteritems.value
-                                            .where((item) => item.id.toString() == selectionController.SemestertextSelection.value)
-                                            .map((item) => item.libelle.toString()).first.toString();
-                                        Navigator.of(context).push(MaterialPageRoute(builder: (context) => PlanningCours(
-                                          semesterID: selectionController.SemestertextSelection.value.toString(),
-                                          semester: name,
-                                          emploiID: data["id"].toString()
-                                        )));
-                                      }else{
-                                        showTopSnackBar(
-                                          Overlay.of(context),
-                                          CustomSnackBar.info(
-                                            message: 'aucun emploi du temps n\'est disponible',
-                                          ),
+                                      String userType = await sharedPreferencesController.getType(); // Assuming you have a method to get the user type
+
+                                      if (userType == 'enseignant') {
+                                        // Call the API for teachers
+                                        Map<String, dynamic> data = await APIs.GetAllEmploiDuTempsforTeacher(
+                                            context,
+                                            anneeUniversitaire,
+                                            selectionController.SemestertextSelection.value
                                         );
+                                        if (data != null) {
+                                          String name = selectionController.Semesteritems.value
+                                              .where((item) => item.id.toString() == selectionController.SemestertextSelection.value)
+                                              .map((item) => item.libelle.toString())
+                                              .first
+                                              .toString();
+                                          Navigator.of(context).push(MaterialPageRoute(
+                                              builder: (context) => TeacherPlanning(
+                                                semester: name,
+                                                emploiID: data["id"].toString(),
+                                              )));
+                                        } else {
+                                          showTopSnackBar(
+                                            Overlay.of(context),
+                                            CustomSnackBar.info(
+                                              message: 'aucun emploi du temps n\'est disponible',
+                                            ),
+                                          );
+                                        }
+                                      } else if (userType == 'etudiant') {
+                                        // Call the API for students
+                                        Map<String, dynamic> data = await APIs.GetAllEmploiDuTemps(
+                                            context,
+                                            anneeUniversitaire,
+                                            section,
+                                            selectionController.SemestertextSelection.value
+                                        );
+                                        if (data != null) {
+                                          String name = selectionController.Semesteritems.value
+                                              .where((item) => item.id.toString() == selectionController.SemestertextSelection.value)
+                                              .map((item) => item.libelle.toString())
+                                              .first
+                                              .toString();
+                                          Navigator.of(context).push(MaterialPageRoute(
+                                              builder: (context) => PlanningCours(
+                                                semesterID: selectionController.SemestertextSelection.value.toString(),
+                                                semester: name,
+                                                emploiID: data["id"].toString(),
+                                              )));
+                                        } else {
+                                          showTopSnackBar(
+                                            Overlay.of(context),
+                                            CustomSnackBar.info(
+                                              message: 'aucun emploi du temps n\'est disponible',
+                                            ),
+                                          );
+                                        }
                                       }
                                     }
                                   },

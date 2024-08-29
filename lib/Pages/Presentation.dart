@@ -1,7 +1,6 @@
 import 'package:ecole_kolea_app/Componants/DiscouverItem.dart';
 import 'package:ecole_kolea_app/Constantes/Colors.dart';
 import 'package:ecole_kolea_app/Model/Presentationmodel.dart';
-import 'package:ecole_kolea_app/Model/Presentationmodel.dart';
 import 'package:ecole_kolea_app/Pages/Login.dart';
 import 'package:flutter/material.dart';
 
@@ -125,7 +124,7 @@ class Presentation extends StatelessWidget {
                       Expanded(
                       child: InkWell(
                         onTap: (){
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=>Login()));
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>Login()));
                         },
                         child: Container(
                           padding: EdgeInsets.symmetric(vertical: 10),

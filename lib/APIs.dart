@@ -65,9 +65,9 @@ class APIs {
             preferences.getString("type") != null &&
             preferences.getString("token") != null
         ) {
-          Navigator.pushReplacement(
-            context,
+          Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (context) => ConnectedHomePage()),
+                (route) => false, // This removes all previous routes
           );
         }
       } else {
@@ -1023,6 +1023,35 @@ class APIs {
     // Return an empty list in case of an error
     return {};
   }
+  static Future<Map<String, dynamic>> GetAllEmploiDuTempsforTeacher(BuildContext context, String annee, String semester) async {
+    try {
+      final SharedPreferences preferences = await SharedPreferences.getInstance();
+
+      final response = await http.get(
+        Uri.parse('${API_URL}/api/emploidutemps/${annee}/${semester}'),
+        headers: {'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${preferences.getString("token").toString()}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> responseData = json.decode(response.body);
+        return responseData;
+      } else {
+        print('Error receiving emploi du temps data: ${response.body}');
+      }
+    } catch (error) {
+      print('Error fetching emploi du temps data: $error');
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: 'vérifier votre internet',
+        ),
+      );
+    }
+    // Return an empty list in case of an error
+    return {};
+  }
   static Future<List<dynamic>> GetAllCreneauByemploidutemps(BuildContext context, String id) async {
     try {
       final SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -1041,6 +1070,34 @@ class APIs {
       }
     } catch (error) {
       print('Error fetching Créneaus By emploidutemps data: $error');
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: 'vérifier votre internet',
+        ),
+      );
+    }
+    // Return an empty list in case of an error
+    return [];
+  }
+  static Future<List<dynamic>> GetAllCalendarForTeacher(BuildContext context, String annee) async {
+    try {
+      final SharedPreferences preferences = await SharedPreferences.getInstance();
+
+      final response = await http.get(
+        Uri.parse('${API_URL}/api/creneau/calendar/${preferences.getString("id").toString()}/${annee}'),
+        headers: {'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${preferences.getString("token").toString()}',
+        },
+      );
+      if (response.statusCode == 200) {
+        List<dynamic> responseData = json.decode(response.body);
+        return responseData;
+      } else {
+        print('Error receiving calendar for teacher data: ${response.body}');
+      }
+    } catch (error) {
+      print('Error fetching calendar for teacher data: $error');
       showTopSnackBar(
         Overlay.of(context),
         CustomSnackBar.error(

@@ -79,16 +79,11 @@ class _ConnectedHomePage extends State<ConnectedHomePage> {
     
   }
 
-  
-
-
   void _onitemtapped(int index){
     setState(() {
       _selectedIndex=index;
     });
   }
-
- 
 
   @override
   Widget build(BuildContext context) {
@@ -178,7 +173,7 @@ class _ConnectedHomePage extends State<ConnectedHomePage> {
                Navigator.pop(context);
               },  
             ),
-            if(mysourceType == "etudiant")
+            if(mysourceType == "etudiant" || mysourceType == "enseignant")
             ListTile(
               leading: Icon(CupertinoIcons.calendar),
               selected: _selectedIndex==4,
