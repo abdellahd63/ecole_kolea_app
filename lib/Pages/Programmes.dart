@@ -72,7 +72,7 @@ class Programmes extends StatelessWidget {
                         child: DropdownButton2<String>(
                           isExpanded: true,
                           hint: Text(
-                            'sélectionner le semester',
+                            'sélectionner le semestre',
                             style: TextStyle(
                               fontSize: 12,
                               color: Theme.of(context).hintColor,

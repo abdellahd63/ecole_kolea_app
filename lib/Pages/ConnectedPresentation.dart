@@ -46,10 +46,12 @@ class _ConnectedpresentationState extends State<Connectedpresentation> {
 
               // bienvenu
 
+              
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Bienvenue de retour étudiant ! \n Préparez-vous à atteindre vos objectifs.",
+                  Text("de retour ! \n Préparez-vous à atteindre vos objectifs.",
                     textAlign: TextAlign.center,
                     softWrap: true,
                     maxLines: 5,
@@ -101,8 +103,45 @@ class _ConnectedpresentationState extends State<Connectedpresentation> {
                         ),
                       )
                       ),
-                    if(mysourceType == "etudiant")
+
+                    if(mysourceType == "etudiant" || mysourceType == "enseignant")
                       SizedBox(width: 20,),
+                    if(mysourceType == "enseignant")
+
+                    Expanded(
+                      child: InkWell(
+                        onTap: (){
+                          widget.onnotificationButtonPressed();
+                        },
+                        child: Container(
+
+                          height: 170,
+                          decoration: BoxDecoration(
+                            color: MyAppColors.dimopacityvblue,
+                            borderRadius: BorderRadius.circular(20),
+
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                height: 70,
+                                child: Image.asset('lib/Assets/Images/Notification.png',)),
+                                SizedBox(height: 10,),
+                                Text('Notifications',
+                                  style: TextStyle(
+                                      color: MyAppColors.principalcolor,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16
+                                  ),
+                                )
+                            ],
+                          ),
+                        ),
+                      )
+                      ),
+
                     if(mysourceType == "etudiant")
                       Expanded(
                       child: InkWell(
@@ -214,6 +253,49 @@ class _ConnectedpresentationState extends State<Connectedpresentation> {
                       )
                       ),
 
+                  ],
+                ),
+              ),
+           
+              if(mysourceType == "enseignant")
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                            child: InkWell(
+                              onTap: (){
+                                widget.onpresenceButtonPressed();
+                              },
+                              child: Container(
+                                height: 170,
+                                decoration: BoxDecoration(
+                                  color: MyAppColors.dimopacityvblue,
+                                  borderRadius: BorderRadius.circular(20),
+                    
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Container( height: 70, child: Image.asset('lib/Assets/Images/qrcode.png')),
+                                      SizedBox(height: 10,),
+                                      Text('Presence',
+                                        style: TextStyle(
+                                            color: MyAppColors.principalcolor,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 16
+                                        ),
+                                      )
+                                  ],
+                                ),
+                              ),
+                            )
+                            ),
+
+                            SizedBox(width: 20,),
+                
+                            Expanded(child: Container())
                   ],
                 ),
               ),

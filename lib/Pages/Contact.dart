@@ -20,7 +20,7 @@ class Contact extends StatelessWidget {
               children: [
                 Image.asset('lib/Assets/Images/logo.png'),
       
-                Text("Si vous avez la moindre des choses \n N’hésitez pas a nous contacter", 
+                Text("Pour toute information \n N’hésitez pas a nous contacter", 
                   textAlign: TextAlign.center,
                   softWrap: true,
                   style: TextStyle(

@@ -58,7 +58,7 @@ class Filiere extends StatelessWidget {
 
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text("L'ESGEN propose1 une formation en cycle préparatoire de deux ans, qui après un concours national",
+                child: Text("L'ESGEN propose une formation en cycle préparatoire de deux ans, qui après un concours national",
                       textAlign: TextAlign.justify,
                       style: TextStyle(color: MyAppColors.black, fontSize: 15,),
                     ),
@@ -93,7 +93,7 @@ class Filiere extends StatelessWidget {
 
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text("Après un concours national peut déboucher sur un deuxième cycle avec cinq parcours possible sanctionné par un diplôme de Master en :",
+                child: Text("Après un concours national, la formation peut déboucher sur un deuxième cycle avec cinq parcours possible sanctionné par un diplôme de Master en :",
                       textAlign: TextAlign.justify,
                       style: TextStyle(color: MyAppColors.black, fontSize: 15,),
                     ),

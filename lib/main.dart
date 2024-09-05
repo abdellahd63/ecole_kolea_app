@@ -1,6 +1,4 @@
-
 import 'dart:io';
-
 import 'package:ecole_kolea_app/Constantes/Colors.dart';
 import 'package:ecole_kolea_app/Pages/ConnectedHomePage.dart';
 import 'package:ecole_kolea_app/Pages/DeconnectedHomepage.dart';

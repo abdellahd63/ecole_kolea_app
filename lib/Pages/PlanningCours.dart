@@ -141,6 +141,7 @@ List<Creneau> cleanArray(List<Creneau> items) {
 
   return result;
 }
+
 int getDayNumber(String dayName) {
   switch (dayName.toLowerCase()) {
     case 'lundi':

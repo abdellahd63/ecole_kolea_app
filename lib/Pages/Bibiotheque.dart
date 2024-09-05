@@ -64,7 +64,7 @@ class Bibiotheque extends StatelessWidget {
                         Container(
                           margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                           child: SearchBar(
-                            hintText: 'Search for your bibliotheque',
+                            hintText: 'Recherche',
                             hintStyle: MaterialStateProperty.resolveWith((states) => TextStyle(fontSize: 12)),
                             textStyle: MaterialStateProperty.resolveWith((states) => TextStyle(
                                 fontSize: 12,

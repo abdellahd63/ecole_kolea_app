@@ -114,7 +114,7 @@ class Presentation extends StatelessWidget {
                             color: MyAppColors.dimopacityvblue,
                             borderRadius: BorderRadius.circular(10)
                           ),
-                          child: Text('Voir nos filiers',textAlign: TextAlign.center ,style: TextStyle(color: MyAppColors.principalcolor),),
+                          child: Text('Voir nos filières',textAlign: TextAlign.center ,style: TextStyle(color: MyAppColors.principalcolor),),
                         ),
                       ),
                       ),
